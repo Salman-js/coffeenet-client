@@ -1,24 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import TopNav from './components/topNav';
+import MainLanding from './pages/mainLanding';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+import MainDrawer from './components/drawer';
+import DashboardAdmin from './pages/admin/dashboardAdmin';
+import ActiveAccountsContainer from './pages/admin/activeAccountsContainer';
+import PendingAccountsContainer from './pages/admin/pendingAccountsContainer';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <Router>
+        <div className='App'>
+          <TopNav />
+          <div className='dashboard-container-main flex flex-row w-full h-full'>
+            <MainDrawer />
+            <Routes>
+              <Route exact path='/' element={<MainLanding />} />
+              <Route
+                exact
+                path='/dashboard-admin'
+                element={<DashboardAdmin />}
+              />
+              <Route
+                exact
+                path='/active-accounts'
+                element={<ActiveAccountsContainer />}
+              />
+              <Route
+                exact
+                path='/pending-accounts'
+                element={<PendingAccountsContainer />}
+              />
+            </Routes>
+          </div>
+        </div>
+      </Router>
+    </Provider>
   );
 }
 

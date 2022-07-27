@@ -1,13 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Product Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'),
+    url(https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2)
+      format('woff2');
+}
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: Product Sans;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 1em;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 1em;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.App {
+  @apply text-center flex justify-center items-center bg-gradient-to-tr from-gray-100 to-slate-300 w-full flex-col;
+  min-height: 100vh;
+  height: 100vh;
+}
+.navbar {
+  @apply w-full flex flex-row justify-between py-2 px-6 shadow-md;
+}
+/* width */
+.MuiDrawer-root ::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+.MuiDrawer-root ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 1em;
+}
+
+/* Handle */
+.MuiDrawer-root ::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 1em;
+}
+
+/* Handle on hover */
+.MuiDrawer-root ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+.dashboard-container-main {
+  transition: all 0.5s ease-in-out;
+}
+.main-landing-container {
+  @apply w-full h-full  text-left items-start flex justify-start transition-all;
+  background-image: url('../public/assets/landing-bg.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  transition: all 0.5s ease-in-out;
+}
+.main-landing-content {
+  @apply w-full h-full p-10 pt-24 my-auto text-left items-start flex flex-col justify-start;
+  background-image: linear-gradient(to top right, #e8e6e6, #ffffff00);
+}
+.dashboard-container {
+  @apply w-full min-h-full bg-gradient-to-tr from-gray-100 to-slate-300 p-10 flex flex-col max-h-fit overflow-auto;
+}
+.modal-container {
+  @apply bg-gray-200 p-8 absolute top-0 right-0 flex justify-center items-center;
+  height: 100%;
+  width: 30%;
+}
+@media screen and (max-width: 768px) {
+  .App {
+    height: 140vh;
+  }
+  .main-landing-container {
+    height: 140vh;
+  }
+  .modal-container {
+    height: 100%;
+    width: 90%;
+  }
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+.nav-logo-container legend {
+  width: unset;
 }
