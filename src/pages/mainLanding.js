@@ -8,11 +8,16 @@ import LoginForm from '../components/loginForm';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { emptyRegUser } from '../actions/auth';
+import { emptyErrors } from '../actions/generalActions';
 
 function MainLanding() {
-  const { isAuthenticated, isAdminAuthenticated, loading } = useSelector(
-    (state) => state.auth
-  );
+  const {
+    isAuthenticated,
+    isAdminAuthenticated,
+    isFinancerAuthenticated,
+    isDocmanagerAuthenticated,
+    loading,
+  } = useSelector((state) => state.auth);
   const errors = useSelector((state) => state.errors);
   const { regUser } = useSelector((state) => state.register);
   const [changed, setChanged] = useState(false);
@@ -27,7 +32,19 @@ function MainLanding() {
     if (isAdminAuthenticated) {
       navigate('/dashboard-admin');
     }
-  }, [isAuthenticated, isAdminAuthenticated]);
+    if (isFinancerAuthenticated) {
+      navigate('/financer-dashboard');
+    }
+    if (isDocmanagerAuthenticated) {
+      navigate('/doc-dashboard');
+    }
+  }, [
+    isAuthenticated,
+    isAdminAuthenticated,
+    isFinancerAuthenticated,
+    isDocmanagerAuthenticated,
+    navigate,
+  ]);
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -45,18 +62,30 @@ function MainLanding() {
     };
     if (errors.user || errors.password) {
       toast.error('Invalid Email or Password', toastOptions);
+      setTimeout(() => {
+        dispatch(emptyErrors());
+      }, 8000);
     }
     if (errors.checkemail) {
       toast.error('There Is Already An Account With That Email', toastOptions);
+      setTimeout(() => {
+        dispatch(emptyErrors());
+      }, 8000);
     }
     if (errors.unknown) {
       toast.error('Unknown Error, Please Try Again', toastOptions);
+      setTimeout(() => {
+        dispatch(emptyErrors());
+      }, 8000);
     }
     if (errors.pending) {
       toast.warning(
         'This Account Is Currently Being Reviewed',
         toastLightOptions
       );
+      setTimeout(() => {
+        dispatch(emptyErrors());
+      }, 8000);
     }
     if (changed && regUser) {
       toast.success(
@@ -67,7 +96,7 @@ function MainLanding() {
         dispatch(emptyRegUser());
       }, 6000);
     }
-  }, [errors, regUser, changed]);
+  }, [errors, regUser, changed, dispatch]);
   return (
     <>
       <Grid container className='main-landing-container'>
@@ -77,14 +106,12 @@ function MainLanding() {
             className='w-full lg:w-1/2 md:w2/3 transition-all'
             color='inherit'
           >
-            <p className='h1 font-extrabold text-7xl'>
-              Laborum mollit cupidatat magna
-            </p>
+            <p className='h1 font-extrabold text-7xl'>CoffeeNet Trading</p>
           </div>
           <div item className='w-full lg:w-1/2 md:w-2/3 my-8 transition-all'>
             <Typography variant='h5' color='inherit'>
-              Laborum mollit cupidatat magna commodo culpa commodo fugiat mollit
-              in duis minim.
+              Welcome to the CoffeeNet ERP system. Login with your credentials
+              or click on Get Started to create your account.
             </Typography>
           </div>
           <Grid container lg={5} xs={12}>

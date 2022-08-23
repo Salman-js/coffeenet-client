@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
-import { Grid, IconButton, CircularProgress } from '@mui/material';
+import { Grid, IconButton, LinearProgress } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Check, Close, DeleteForever } from '@mui/icons-material';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import Skeleton from '@mui/material/Skeleton';
 import { approveAcc, rejectAcc, deleteAcc } from '../../actions/adminActions';
+import { CustomNoRowsOverlay } from '../noRowsOverlay';
 
-const BootstrapTooltip = styled(({ className, ...props }) => (
+export const BootstrapTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} arrow classes={{ popper: className }} />
 ))(({ theme }) => ({
   [`& .${tooltipClasses.arrow}`]: {
@@ -55,15 +56,9 @@ function AccountsList({ admin, type }) {
   }
 
   const columns = [
-    {
-      field: 'number',
-      headerName: 'Number',
-      width: 70,
-      valueGetter: (params) => params.api.getRowIndex() * -1,
-    },
     { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'fname', headerName: 'First name', width: 130 },
-    { field: 'lname', headerName: 'Last name', width: 130 },
+    { field: 'fname', headerName: 'First Name', width: 130 },
+    { field: 'lname', headerName: 'Last Name', width: 130 },
     {
       field: 'email',
       headerName: 'Email',
@@ -72,14 +67,16 @@ function AccountsList({ admin, type }) {
     {
       field: 'type',
       headerName: 'Type',
-      description: 'This column has a value getter and is not sortable.',
+      description: 'This column is not sortable.',
       sortable: false,
-      width: 160,
+      width: 100,
       valueGetter: (params) =>
         params.row.type === 'users'
           ? 'User'
           : params.row.type === 'financers'
           ? 'Finance Officer'
+          : params.row.type === 'documenters'
+          ? 'Document Officer'
           : 'Admin',
     },
     {
@@ -160,28 +157,25 @@ function AccountsList({ admin, type }) {
       <p className='h4 text-left'>
         {type === 'active' ? 'Active' : 'Pending'} Accounts List
       </p>
-      {loading ? (
-        <div className='m-auto'>
-          <Loader limit={7} />
-        </div>
-      ) : (
-        <DataGrid
-          className='bg-white p-4'
-          rows={type === 'active' ? activeAccounts : pendingAccounts}
-          columns={columns}
-          components={{
-            Toolbar: GridToolbar,
-          }}
-          componentsProps={{
-            toolbar: { showQuickFilter: true },
-          }}
-        />
-      )}
+      <DataGrid
+        className='bg-white p-4'
+        rows={type === 'active' ? activeAccounts : pendingAccounts}
+        columns={columns}
+        components={{
+          Toolbar: GridToolbar,
+          NoRowsOverlay: CustomNoRowsOverlay,
+          LoadingOverlay: LinearProgress,
+        }}
+        componentsProps={{
+          toolbar: { showQuickFilter: true },
+        }}
+        loading={loading}
+      />
     </Grid>
   );
 }
 
-const Loader = ({ limit }) => {
+export const Loader = ({ limit }) => {
   let i;
   let loadingList = [];
   for (i = 0; i < limit; i++) {

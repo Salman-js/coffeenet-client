@@ -11,6 +11,11 @@ import {
   LOGOUT,
   LOADING,
   GET_ERRORS,
+  FINANCER_LOADED,
+  FINANCER_LOGIN_SUCCESS,
+  BASE_URL,
+  DOCMANAGER_LOGIN_SUCCESS,
+  DOCMANAGER_LOADED,
 } from './types';
 import setAuthToken from '../utils/setAuthToken';
 
@@ -21,7 +26,7 @@ export const loadUser = () => async (dispatch) => {
   }
 
   try {
-    const res = await axios.get('/api/auth');
+    const res = await axios.get(`${BASE_URL}/api/auth`);
 
     dispatch({
       type: USER_LOADED,
@@ -45,10 +50,58 @@ export const loadAdmin = () => async (dispatch) => {
   }
 
   try {
-    const res = await axios.get('/api/auth/admin');
+    const res = await axios.get(`${BASE_URL}/api/auth/admin`);
 
     dispatch({
       type: ADMIN_LOADED,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: AUTH_ERROR,
+    });
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Load Financer
+export const loadFinancer = () => async (dispatch) => {
+  if (localStorage.token) {
+    setAuthToken(localStorage.token);
+  }
+
+  try {
+    const res = await axios.get(`${BASE_URL}/api/auth/financer`);
+
+    dispatch({
+      type: FINANCER_LOADED,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: AUTH_ERROR,
+    });
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Load Doc manager
+export const loadDocmanager = () => async (dispatch) => {
+  if (localStorage.token) {
+    setAuthToken(localStorage.token);
+  }
+
+  try {
+    const res = await axios.get(`${BASE_URL}/api/auth/documenter`);
+
+    dispatch({
+      type: DOCMANAGER_LOADED,
       payload: res.data,
     });
   } catch (err) {
@@ -74,14 +127,15 @@ export const register =
 
     const body = JSON.stringify({ fname, lname, type, email, password, date });
     try {
-      const res = await axios.post('/api/user', body, config);
+      const res = await axios.post(`${BASE_URL}/api/user`, body, config);
       dispatch({
         type: REGISTER_SUCCESS,
         payload: res.data,
       });
     } catch (err) {
       dispatch({
-        type: REGISTER_FAIL,
+        type: GET_ERRORS,
+        payload: err.response.data,
       });
     }
   };
@@ -105,7 +159,7 @@ export const login =
     const body = JSON.stringify({ email, password });
 
     try {
-      const res = await axios.post('/api/auth', body, config);
+      const res = await axios.post(`${BASE_URL}/api/auth`, body, config);
 
       dispatch({
         type: LOGIN_SUCCESS,
@@ -119,7 +173,7 @@ export const login =
       });
       dispatch({
         type: GET_ERRORS,
-        payload: err.response.data,
+        payload: err.response.data ? err.response.data : err,
       });
     }
   };
@@ -136,7 +190,7 @@ export const adminLogin = (email, password) => async (dispatch) => {
   const body = JSON.stringify({ email, password });
 
   try {
-    const res = await axios.post('/api/auth/admin', body, config);
+    const res = await axios.post(`${BASE_URL}/api/auth/admin`, body, config);
 
     dispatch({
       type: ADMIN_LOGIN_SUCCESS,
@@ -145,15 +199,83 @@ export const adminLogin = (email, password) => async (dispatch) => {
 
     dispatch(loadAdmin());
   } catch (err) {
+    console.log(err);
     dispatch({
       type: LOGIN_FAIL,
     });
     dispatch({
       type: GET_ERRORS,
-      payload: err.response.data,
+      payload: err.response.data ? err.response.data : err,
     });
   }
 };
+
+// Login Financer
+export const financerLogin = (email, password) => async (dispatch) => {
+  dispatch(loading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const body = JSON.stringify({ email, password });
+
+  try {
+    const res = await axios.post(`${BASE_URL}/api/auth/financer`, body, config);
+
+    dispatch({
+      type: FINANCER_LOGIN_SUCCESS,
+      payload: res.data,
+    });
+
+    dispatch(loadFinancer());
+  } catch (err) {
+    dispatch({
+      type: LOGIN_FAIL,
+    });
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data ? err.response.data : err,
+    });
+  }
+};
+
+// Login Doc Manager
+export const docmanagerLogin = (email, password) => async (dispatch) => {
+  dispatch(loading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const body = JSON.stringify({ email, password });
+
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/auth/documenter`,
+      body,
+      config
+    );
+
+    dispatch({
+      type: DOCMANAGER_LOGIN_SUCCESS,
+      payload: res.data,
+    });
+
+    dispatch(loadDocmanager());
+  } catch (err) {
+    dispatch({
+      type: LOGIN_FAIL,
+    });
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data ? err.response.data : err,
+    });
+  }
+};
+
 export const loading = () => (dispatch) => {
   dispatch({ type: LOADING });
 };

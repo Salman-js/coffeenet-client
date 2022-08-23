@@ -7,7 +7,11 @@ import {
   DELETE_ACCOUNT,
   UPDATE_PCR,
   DELETE_PCR,
+  GET_PCR,
   LOADING,
+  ADD_CUPPING,
+  ADD_LOADING,
+  BASE_URL,
 } from './types';
 
 // Get active accounts
@@ -20,7 +24,10 @@ export const getActiveAccs = () => async (dispatch) => {
     },
   };
   try {
-    const res = await axios.get('/api/admin/active-accounts', config);
+    const res = await axios.get(
+      `${BASE_URL}/api/admin/active-accounts`,
+      config
+    );
     dispatch({
       type: GET_ACTIVE_ACCOUNTS,
       payload: res.data,
@@ -43,7 +50,10 @@ export const getPendingAccs = () => async (dispatch) => {
     },
   };
   try {
-    const res = await axios.get('/api/admin/pending-accounts', config);
+    const res = await axios.get(
+      `${BASE_URL}/api/admin/pending-accounts`,
+      config
+    );
     dispatch({
       type: GET_PENDING_ACCOUNTS,
       payload: res.data,
@@ -79,7 +89,11 @@ export const approveAcc =
     };
     try {
       dispatch(rejectAcc(idObj));
-      const res = await axios.post('/api/admin/approve-account', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/admin/approve-account`,
+        body,
+        config
+      );
     } catch (err) {
       dispatch({
         type: GET_ERRORS,
@@ -104,7 +118,11 @@ export const rejectAcc =
         type: REJECT_ACCOUNT,
         payload: id,
       });
-      const res = await axios.post('/api/admin/reject-account', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/admin/reject-account`,
+        body,
+        config
+      );
     } catch (err) {
       dispatch({
         type: GET_ERRORS,
@@ -129,7 +147,11 @@ export const deleteAcc =
         type: DELETE_ACCOUNT,
         payload: id,
       });
-      const res = await axios.post('/api/admin/delete-account', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/admin/delete-account`,
+        body,
+        config
+      );
     } catch (err) {
       dispatch({
         type: GET_ERRORS,
@@ -150,7 +172,11 @@ export const rejectPcr =
     };
     const body = JSON.stringify({ id });
     try {
-      const res = await axios.post('/api/admin/reject-pcr', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/admin/reject-pcr`,
+        body,
+        config
+      );
       dispatch({
         type: DELETE_PCR,
         payload: id,
@@ -179,7 +205,11 @@ export const approvePcr =
     };
     const body = JSON.stringify({ id });
     try {
-      const res = await axios.post('/api/admin/approve-pcr', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/admin/approve-pcr`,
+        body,
+        config
+      );
       dispatch({
         type: DELETE_PCR,
         payload: id,
@@ -196,6 +226,90 @@ export const approvePcr =
     }
   };
 
+// Get pcrs
+export const getPcrs = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/admin/pcr`, config);
+    dispatch({
+      type: GET_PCR,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Add cupping
+export const addCupping =
+  ({
+    name,
+    createdBy,
+    cup1,
+    cup2,
+    cup3,
+    cup1Total,
+    cup2Total,
+    cup3Total,
+    cup1Overall,
+    cup2Overall,
+    cup3Overall,
+    qualityscale,
+  }) =>
+  async (dispatch) => {
+    dispatch(setAddLoading());
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+
+    const body = JSON.stringify({
+      name,
+      createdBy,
+      cup1,
+      cup2,
+      cup3,
+      cup1Total,
+      cup2Total,
+      cup3Total,
+      cup1Overall,
+      cup2Overall,
+      cup3Overall,
+      qualityscale,
+    });
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/admin/add-cuppings`,
+        body,
+        config
+      );
+      dispatch({
+        type: ADD_CUPPING,
+        payload: res.data,
+      });
+    } catch (err) {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      });
+    }
+  };
+
 export const setLoading = () => (dispatch) => {
   dispatch({ type: LOADING });
+};
+
+export const setAddLoading = () => (dispatch) => {
+  dispatch({ type: ADD_LOADING });
 };

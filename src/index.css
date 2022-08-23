@@ -88,6 +88,9 @@ body {
   height: 100%;
   width: 30%;
 }
+.modal-content-container {
+  @apply bg-gray-200 p-4 absolute top-20 left-1/3 w-1/3 rounded-xl;
+}
 @media screen and (max-width: 768px) {
   .App {
     height: 140vh;
@@ -104,6 +107,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-.nav-logo-container legend {
+.nav-logo-container legend,
+.modal-body legend {
   width: unset;
 }

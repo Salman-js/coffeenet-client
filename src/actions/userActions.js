@@ -5,21 +5,29 @@ import {
   ADD_OFFICEMAT,
   SEND_PCR,
   GET_ERRORS,
+  ADD_LOADING,
+  BASE_URL,
 } from './types';
 
 // Add sample
 export const addSample =
   ({ name, username, type, date }) =>
   async (dispatch) => {
+    dispatch(setAddLoading());
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
       },
     };
 
     const body = JSON.stringify({ name, username, type, date });
     try {
-      const res = await axios.post('/api/user/add-sample', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/user/add-sample`,
+        body,
+        config
+      );
       dispatch({
         type: ADD_SAMPLE,
         payload: res.data,
@@ -34,17 +42,22 @@ export const addSample =
 
 // Send pcr
 export const sendPcr =
-  ({ fname, lname, reason, amount, date }) =>
+  ({ userId, fname, lname, reason, amount, date }) =>
   async (dispatch) => {
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
       },
     };
 
-    const body = JSON.stringify({ fname, lname, reason, amount, date });
+    const body = JSON.stringify({ userId, fname, lname, reason, amount, date });
     try {
-      const res = await axios.post('/api/user/send-pcr', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/user/send-pcr`,
+        body,
+        config
+      );
       dispatch({
         type: SEND_PCR,
         payload: res.data,
@@ -61,15 +74,21 @@ export const sendPcr =
 export const addSite =
   ({ name, location, price, map }) =>
   async (dispatch) => {
+    dispatch(setAddLoading());
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
       },
     };
 
     const body = JSON.stringify({ name, location, price, map });
     try {
-      const res = await axios.post('/api/user/add-site', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/user/add-site`,
+        body,
+        config
+      );
       dispatch({
         type: ADD_SITE,
         payload: res.data,
@@ -84,17 +103,23 @@ export const addSite =
 
 // Add office material
 export const addOfficeMat =
-  ({ type, name, dateofpurchase, price, buyer }) =>
+  ({ type, name, dop, price, buyer }) =>
   async (dispatch) => {
+    dispatch(setAddLoading());
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
       },
     };
 
-    const body = JSON.stringify({ type, name, dateofpurchase, price, buyer });
+    const body = JSON.stringify({ type, name, dop, price, buyer });
     try {
-      const res = await axios.post('/api/user/add-officemat', body, config);
+      const res = await axios.post(
+        `${BASE_URL}/api/user/add-officemat`,
+        body,
+        config
+      );
       dispatch({
         type: ADD_OFFICEMAT,
         payload: res.data,
@@ -106,3 +131,7 @@ export const addOfficeMat =
       });
     }
   };
+
+export const setAddLoading = () => (dispatch) => {
+  dispatch({ type: ADD_LOADING });
+};
