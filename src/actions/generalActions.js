@@ -12,6 +12,10 @@ import {
   GET_INVOICES,
   GET_SHIPPING,
   GET_PACKING,
+  GET_WAYBILLS,
+  GET_CERTS,
+  GET_SHIPDECS,
+  GET_WEIGHTNOTES,
 } from './types';
 
 // Get samples
@@ -190,6 +194,101 @@ export const getPackings = () => async (dispatch) => {
     const res = await axios.get(`${BASE_URL}/api/document/packings`, config);
     dispatch({
       type: GET_PACKING,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Get waybills
+export const getWaybills = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/document/waybills`, config);
+    dispatch({
+      type: GET_WAYBILLS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Get CERTIFICATES
+export const getCerts = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/document/certs`, config);
+    dispatch({
+      type: GET_CERTS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Get Shipping Declerations
+export const getShipDecs = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/document/ship-decs`, config);
+    dispatch({
+      type: GET_SHIPDECS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Get Weight Notes
+export const getWeightNotes = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(
+      `${BASE_URL}/api/document/weight-notes`,
+      config
+    );
+    dispatch({
+      type: GET_WEIGHTNOTES,
       payload: res.data,
     });
   } catch (err) {

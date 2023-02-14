@@ -18,12 +18,23 @@ import SitesAdmin from './pages/admin/sitesAdmin';
 import PendingPcr from './pages/admin/pendingPcr';
 import ApprovedPcr from './pages/admin/approvedPcr';
 import CuppingAdmin from './pages/admin/cuppingAdmin';
-import Invoices from './pages/docManager/invoices';
-import InvoicesList from './pages/docManager/invoicesList';
-import ShipmentInstructions from './pages/docManager/shipmentInstructions';
-import ShippingInstructionsList from './pages/docManager/shippingInstructionsList';
-import NewPackingList from './pages/docManager/newPackingList';
-import PackingLists from './pages/docManager/packingLists';
+import Invoices from './pages/docManager/Create/invoices';
+import InvoicesList from './pages/docManager/View/invoicesList';
+import ShipmentInstructions from './pages/docManager/Create/shipmentInstructions';
+import ShippingInstructionsList from './pages/docManager/View/shippingInstructionsList';
+import NewPackingList from './pages/docManager/Create/newPackingList';
+import PackingLists from './pages/docManager/View/packingLists';
+import NewWayBill from './pages/docManager/Create/newWayBill';
+import WayBills from './pages/docManager/View/wayBills';
+import NewInlandTransportCertificate from './pages/docManager/Create/newInlandTransportCertificate';
+import InlandTransportCertificates from './pages/docManager/View/inlandTransportCertificates';
+import AddCupping from './pages/admin/addCupping';
+import NewShippersDecleration from './pages/docManager/Create/newShippersDecleration';
+import ShippingDeclerations from './pages/docManager/View/shippingDeclerations';
+import NewWeightNote from './pages/docManager/Create/newWeightNote';
+import WeightNotes from './pages/docManager/View/weightNotes';
+import UpdateInvoice from './pages/docManager/Update/updateInvoice';
+import UpdateWeightNote from './pages/docManager/Update/updateWeightNotes';
 function App() {
   return (
     <Provider store={store}>
@@ -60,6 +71,7 @@ function App() {
               <Route exact path='/pending-pcr' element={<PendingPcr />} />
               <Route exact path='/approved-pcr' element={<ApprovedPcr />} />
               <Route exact path='/admin-cupping' element={<CuppingAdmin />} />
+              <Route exact path='/new-cupping' element={<AddCupping />} />
               <Route exact path='/invoices' element={<InvoicesList />} />
               <Route exact path='/new-invoice' element={<Invoices />} />
               <Route
@@ -77,6 +89,40 @@ function App() {
                 exact
                 path='/new-packing-list'
                 element={<NewPackingList />}
+              />
+              <Route exact path='/way-bills' element={<WayBills />} />
+              <Route exact path='/new-way-bill' element={<NewWayBill />} />
+              <Route
+                exact
+                path='/certificates'
+                element={<InlandTransportCertificates />}
+              />
+              <Route
+                exact
+                path='/new-cert'
+                element={<NewInlandTransportCertificate />}
+              />
+              <Route
+                exact
+                path='/shipper-declerations'
+                element={<ShippingDeclerations />}
+              />
+              <Route
+                exact
+                path='/new-shippers-dec'
+                element={<NewShippersDecleration />}
+              />
+              <Route exact path='/weight-notes' element={<WeightNotes />} />
+              <Route
+                exact
+                path='/new-weight-note'
+                element={<NewWeightNote />}
+              />
+              <Route exact path='/update-inv/:id' element={<UpdateInvoice />} />
+              <Route
+                exact
+                path='/update-wn/:id'
+                element={<UpdateWeightNote />}
               />
             </Routes>
           </div>

@@ -7,44 +7,67 @@ import {
   LinearProgress,
   IconButton,
   Modal,
+  Slide,
   Fab,
+  Backdrop,
   TableContainer,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableRow,
+  TableHead,
   tableCellClasses,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Close, NoteAdd, Print } from '@mui/icons-material';
-import { BootstrapTooltip } from '../../components/admin/accountsList';
-import { emptyErrors, getShippings } from '../../actions/generalActions';
-import { CustomNoRowsOverlay } from '../../components/noRowsOverlay';
+import { BootstrapTooltip } from '../../../components/admin/accountsList';
+import { emptyErrors, getInvoices } from '../../../actions/generalActions';
+import { CustomNoRowsOverlay } from '../../../components/noRowsOverlay';
 import ReactToPrint from 'react-to-print';
 import { toast, ToastContainer } from 'react-toastify';
-import { fabStyle } from '../admin/cuppingAdmin';
+import { fabStyle } from '../../admin/cuppingAdmin';
+import { ToWords } from 'to-words';
 
-function ShippingInstructionsList() {
+function InvoicesList() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
-  const { shippingInstructions, loading } = useSelector(
-    (state) => state.adminData
-  );
+  const { invoices, loading } = useSelector((state) => state.adminData);
   const errors = useSelector((state) => state.errors);
-  const [selectedShipment, setSelectedShipment] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const toBePrinted = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const toWords = new ToWords({
+    localeCode: 'en-IN',
+    converterOptions: {
+      currency: true,
+      ignoreDecimal: false,
+      ignoreZeroCurrency: false,
+      doNotAddOnly: false,
+      currencyOptions: {
+        name: 'Dollar',
+        plural: 'Dollars',
+        symbol: '$',
+        fractionalUnit: {
+          name: 'Cent',
+          plural: 'Cents',
+          symbol: '',
+        },
+      },
+    },
+  });
   function onPrint(selectedRow) {
-    selectedRow.certNumbers = selectedRow.certNumbers.split(',');
-    setSelectedShipment(selectedRow);
+    console.log(selectedRow);
+    setSelectedInvoice(selectedRow);
     setInvoiceModalOpen(true);
+    // const Day = new Date();
+    // const newDate = `${Day.getDate()}/${Day.getMonth()}/${Day.getFullYear()}`;
   }
   const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'name', headerName: 'Coffee Type', width: 200 },
-    { field: 'date', headerName: 'Date', width: 130 },
+    { field: 'reciever', headerName: 'To', width: 200 },
+    { field: 'contractDate', headerName: 'Date', width: 130 },
     {
       field: 'action',
       headerName: 'Print',
@@ -68,8 +91,8 @@ function ShippingInstructionsList() {
     }
   }, [isDocmanagerAuthenticated, navigate]);
   useEffect(() => {
-    dispatch(getShippings());
-  }, [dispatch]);
+    dispatch(getInvoices());
+  }, []);
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -90,20 +113,20 @@ function ShippingInstructionsList() {
       <Grid container className='dashboard-container justify-around'>
         <Grid className='accounts-list-container w-full -mt-3'>
           <div className='w-full flex flex-row justify-between mb-2'>
-            <p className='h4 text-left'>Shipping Instructions</p>
+            <p className='h4 text-left'>Invoices</p>
             <div>
               <Button
                 startIcon={<NoteAdd />}
                 variant='contained'
-                onClick={() => navigate('/new-shipping')}
+                onClick={() => navigate('/new-invoice')}
               >
-                Add Shipping Instruction
+                Add Invoice
               </Button>
             </div>
           </div>
           <DataGrid
             className='bg-white p-4'
-            rows={shippingInstructions}
+            rows={invoices}
             columns={columns}
             components={{
               Toolbar: GridToolbar,
@@ -123,20 +146,20 @@ function ShippingInstructionsList() {
             className='h-screen w-fit overflow-auto'
             style={{ marginLeft: '5%' }}
           >
-            {selectedShipment ? (
+            {selectedInvoice ? (
               <Grid
                 className='invoice-layout-container w-4/5 mx-auto bg-white overflow-hidden'
                 ref={toBePrinted}
               >
-                <Grid className='title-container w-full text-center mb-6 mt-10'>
+                <Grid className='title-container w-full text-center mb-2'>
                   <p className='h3 font-bold underline text-center text-black'>
-                    Shipment Instruction
+                    Commercial Invoice
                   </p>
                 </Grid>
                 <TableContainer
                   component={Paper}
                   sx={{
-                    height: '95%',
+                    height: '80%',
                   }}
                   className='shadow-none'
                 >
@@ -155,204 +178,201 @@ function ShippingInstructionsList() {
                           sx={{ width: '100%' }}
                           className='border-none'
                         >
-                          <strong>Name: </strong>
-                          COFFEENET TRADING PLC
+                          <strong>To: </strong>
+                          {selectedInvoice.reciever}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>TEL: </strong>
-                          +251913128964
+                          <strong>Port: </strong>
+                          {selectedInvoice.port}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>EMAIL: </strong>
-                          coffeenet@gmail.com
+                          <strong>Terms: </strong>
+                          {selectedInvoice.terms}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>PO BOX: </strong>
-                          N/A
+                          <strong>Destination: </strong>
+                          {selectedInvoice.dest}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>CITY, COUNTRY: </strong>
-                          Addis Ababa, Ethiopia
+                          <strong>Number of Bags: </strong>
+                          {selectedInvoice.noOfBags}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%' }}>
+                          <strong>INCOTERMS: </strong>
+                          {selectedInvoice.incoTerms}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%', textAlign: 'right' }}>
+                          <strong>Exporter Bank Details</strong>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%', textAlign: 'right' }}>
+                          <strong>Beneficiary Bank: </strong>
+                          {selectedInvoice.benBank}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%', textAlign: 'right' }}>
+                          <strong>Swift Code: </strong>
+                          {selectedInvoice.swiftCode}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%', textAlign: 'right' }}>
+                          <strong>Correspondant Bank: </strong>
+                          {selectedInvoice.corBank}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%', textAlign: 'right' }}>
+                          <strong>Beneficiary Name: </strong>
+                          {selectedInvoice.benName}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%', textAlign: 'right' }}>
+                          <strong>Account Number: </strong>
+                          {selectedInvoice.accNo}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%', textAlign: 'right' }}>
+                          {selectedInvoice.address}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%' }}>
+                          <p className='w-50 break-words'>
+                            <strong>Packing: </strong>
+                            {selectedInvoice.packing}
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '100%' }}>
+                          <strong>Country of Origin: </strong>
+                          {selectedInvoice.coo}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
                           <strong>CONSIGNEE: </strong>
-                          {selectedShipment.consigne}
+                          {selectedInvoice.consigne}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>NOFIFY PARTY: </strong>
-                          {selectedShipment.notifParty}
+                          <strong>Exporter: </strong>
+                          {selectedInvoice.exporter}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>ADDRESS: </strong>
-                          {selectedShipment.address}
+                          <strong>Contract Number: </strong>
+                          {selectedInvoice.contractNo}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>SHIPMENT: </strong>
-                          {selectedShipment.shipment}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>PORT OF LOADING: </strong>
-                          {selectedShipment.portOfLoad}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>PORT OF DISCHARGE: </strong>
-                          {selectedShipment.portOfDischarge}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          {selectedShipment.shippingLine}
+                          <strong>Contract Date: </strong>
+                          {selectedInvoice.contractDate}
                         </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
-                  <Table
-                    size='small'
-                    sx={{
-                      [`& .${tableCellClasses.root}`]: {
-                        borderBottom: 'none',
-                        borderRight: '1px solid gray',
-                      },
-                    }}
-                  >
-                    <TableRow className='border border-black'>
-                      <TableCell className='max-w-xs w-48'>
-                        <strong>Marks and Numbers</strong>
+                  <Table size='small'>
+                    <TableRow>
+                      <TableCell sx={{ width: 300 }}>
+                        <strong>Packing Mark</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Package</strong>
+                        <strong>Description of Goods</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Description of Packages and Goods</strong>
+                        <strong>Gross Weight(Kg)</strong>
                       </TableCell>
                       <TableCell>
                         <strong>Net Weight(Kg)</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Gross Weight(Kg)</strong>
+                        <strong>Unit Price (USD/lb)</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Total Price (USD)</strong>
                       </TableCell>
                     </TableRow>
                     <TableBody>
                       <TableRow>
-                        <TableCell>{selectedShipment.name}</TableCell>
-                        <TableCell>{selectedShipment.noOfBags} Bags</TableCell>
-                        <TableCell>{selectedShipment.description}</TableCell>
-                        <TableCell>{selectedShipment.netWeight} KGs</TableCell>
-                        <TableCell>
-                          {selectedShipment.grossWeight} KGs
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        {selectedShipment.certNumbers.map((cert) => {
-                          return (
-                            <>
-                              <TableCell>
-                                <p>
-                                  <strong>CERT #: </strong>
-                                  {cert}
-                                </p>
-                              </TableCell>
-                              <TableCell></TableCell>
-                              <TableCell>
-                                <p>
-                                  <strong>CERT #: </strong>
-                                  {cert}
-                                </p>
-                              </TableCell>
-                            </>
-                          );
-                        })}
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className='min-w-fit'>
-                          <p>
-                            <strong>NET WEIGHT: </strong>
-                            {selectedShipment.mnNetWeight} KGs
-                          </p>
-                        </TableCell>
-                        <TableCell></TableCell>
-                        <TableCell>
-                          <p>
-                            <strong>ICO #: </strong>
-                            {selectedShipment.icoNumber}Kg
-                          </p>
-                        </TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>{selectedInvoice.pmName}</TableCell>
+                        <TableCell>{selectedInvoice.description}</TableCell>
+                        <TableCell>{selectedInvoice.grossWeight}</TableCell>
+                        <TableCell>{selectedInvoice.netWeight}</TableCell>
+                        <TableCell>{selectedInvoice.unitPrice}</TableCell>
+                        <TableCell>{selectedInvoice.totalPrice}</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell>
                           <p>
-                            <strong>Destination: </strong>
-                            {selectedShipment.destination}
+                            <strong>ICO#: </strong>
+                            {selectedInvoice.pmICO}
                           </p>
                         </TableCell>
-                        <TableCell></TableCell>
-                        <TableCell>
-                          <p>
-                            <strong>HS CODE: </strong>
-                            {selectedShipment.hsCode}
-                          </p>
-                        </TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>
+                          <p>
+                            <strong>CERT#: </strong>
+                            {selectedInvoice.pmCert}
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
                         <TableCell>
                           <p>
                             <strong>Net Weight: </strong>
-                            {selectedShipment.descNetWeight} KGs
+                            {selectedInvoice.pmNetWeight}
                           </p>
                         </TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
                         <TableCell>
                           <p>
-                            <strong>Packing: </strong>
-                            {selectedShipment.packing}
+                            <strong>CROP: </strong>
+                            {selectedInvoice.pmCrop}
                           </p>
                         </TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <p>
+                            <strong>DEST: </strong>
+                            {selectedInvoice.pmDest}
+                          </p>
+                        </TableCell>
                       </TableRow>
                     </TableBody>
-                    <TableRow className='border border-black'>
-                      <TableCell colSpan={2}></TableCell>
+                  </Table>
+                  <Table size='small'>
+                    <TableRow>
                       <TableCell>
-                        <strong>{selectedShipment.transportation}</strong>
-                      </TableCell>
-                      <TableCell colSpan={2}>
-                        <p>
-                          <strong>Total Net Weight: </strong>
-                          {selectedShipment.descNetWeight} KGs
+                        <p className='break-words'>
+                          {toWords
+                            .convert(selectedInvoice.totalPrice)
+                            .toUpperCase()}
+                          . WE CERTIFY THAT THE CONSIGNMENT IS OF ETHIOPIAN
+                          ORIGIN AND THIS INVOICE IS TRUE AND CORRECT.
                         </p>
                       </TableCell>
                     </TableRow>
@@ -386,4 +406,4 @@ function ShippingInstructionsList() {
   );
 }
 
-export default ShippingInstructionsList;
+export default InvoicesList;

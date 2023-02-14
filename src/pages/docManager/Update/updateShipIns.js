@@ -10,12 +10,12 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { Description, Send, RestartAltRounded } from '@mui/icons-material';
-import { addPacking } from '../../actions/docmanagerActions';
-import { emptyErrors, resetUpdate } from '../../actions/generalActions';
+import { addShipping } from '../../../actions/docmanagerActions';
+import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function NewPackingList() {
+function UpdateShipmentInstructions() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
   const { addDataLoading, dataUpdated } = useSelector(
     (state) => state.adminData
@@ -23,32 +23,39 @@ function NewPackingList() {
   const errors = useSelector((state) => state.errors);
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
-  const [packingList, setPackingList] = useState({
-    buyer: '',
-    type: '',
-    icoNumber: '',
+  const [shipment, setShipment] = useState({
+    consigne: '',
+    notifParty: '',
+    address: '',
+    shipment: '',
+    portOfLoad: '',
+    portOfDischarge: '',
+    bookingNo: '',
+    shippingLine: '',
+    name: '',
     certNumbers: '',
     mnNetWeight: '',
-    crop: '',
     destination: '',
     description: '',
+    icoNumber: '',
+    hsCode: '',
+    descNetWeight: '',
+    packing: '',
     noOfBags: '',
-    bagWeight: '',
-    contractNumber: '',
-    contractDate: newDate,
-    container: '',
-    quantity: '',
-    grossWeight: '',
     netWeight: '',
+    grossWeight: '',
     transportation: '',
-    reciever: '',
+    date: newDate,
   });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [validated, setValidated] = useState(false);
-  function onAddPackingList(e) {
+  function onAddShippment(e) {
     e.preventDefault();
-    dispatch(addPacking(packingList));
+    let newObj = shipment;
+    newObj.createdAt = new Date().getTime();
+    setShipment(newObj);
+    dispatch(addShipping(shipment));
   }
 
   useEffect(() => {
@@ -79,8 +86,8 @@ function NewPackingList() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'Packing list added') {
-      toast.success('Packing list submitted', toastOptions);
+    if (dataUpdated === 'Shipping added') {
+      toast.success('Shipping Instruction submitted', toastOptions);
       setTimeout(() => {
         dispatch(resetUpdate());
       }, 8000);
@@ -88,18 +95,14 @@ function NewPackingList() {
   }, [dataUpdated, dispatch]);
   useEffect(() => {
     setValidated(
-      Object.values(packingList).every((value) => {
+      Object.values(shipment).every((value) => {
         if (!value.toString().trim().length || value === 0) {
           return false;
         }
         return true;
       })
     );
-    setPackingList({
-      ...packingList,
-      createdAt: new Date().getTime(),
-    });
-  }, [packingList]);
+  }, [shipment]);
   useEffect(() => {
     if (!isDocmanagerAuthenticated) {
       navigate('/');
@@ -108,33 +111,36 @@ function NewPackingList() {
   return (
     <>
       <Grid container className='dashboard-container justify-around'>
-        <form onSubmit={onAddPackingList} className='w-full'>
+        <form onSubmit={onAddShippment} className='w-full'>
           <Grid className='accounts-list-container w-full -mt-3'>
             <div className='w-full flex flex-row justify-between mb-2'>
-              <p className='h4 text-left'>Packing Lists</p>
+              <p className='h4 text-left'>Shipping Instruction</p>
               <div className='flex flex-row'>
                 <IconButton
                   variant='contained'
                   onClick={() => {
-                    setPackingList({
-                      buyer: '',
-                      type: '',
-                      icoNumber: '',
+                    setShipment({
+                      consigne: '',
+                      notifParty: '',
+                      address: '',
+                      shipment: '',
+                      portOfLoad: '',
+                      portOfDischarge: '',
+                      bookingNo: '',
+                      shippingLine: '',
+                      name: '',
                       certNumbers: '',
                       mnNetWeight: '',
-                      crop: '',
                       destination: '',
                       description: '',
+                      icoNumber: '',
+                      hsCode: '',
+                      descNetWeight: '',
+                      packing: '',
                       noOfBags: '',
-                      bagWeight: '',
-                      contractNumber: '',
-                      contractDate: newDate,
-                      container: '',
-                      quantity: '',
-                      grossWeight: '',
                       netWeight: '',
+                      grossWeight: '',
                       transportation: '',
-                      reciever: '',
                     });
                   }}
                 >
@@ -157,9 +163,9 @@ function NewPackingList() {
                   <Button
                     startIcon={<Description />}
                     variant='contained'
-                    onClick={() => navigate('/packing-lists')}
+                    onClick={() => navigate('/shipping-instructions')}
                   >
-                    View Packing Lists
+                    View Shipping Instructions
                   </Button>
                 </div>
               </div>
@@ -171,7 +177,7 @@ function NewPackingList() {
           >
             <Grid className='title-container w-full text-center mb-8'>
               <p className='h4 underline text-center text-gray-700'>
-                Packing List
+                Shipping Instruction
               </p>
             </Grid>
             <Grid className='w-full'>
@@ -180,164 +186,134 @@ function NewPackingList() {
                 spacing={2}
                 className='invoice-form-container w-full h-fit'
               >
-                <Grid item lg={12} className='flex justify-center'>
-                  <TextField
-                    className='w-1/2'
-                    type='text'
-                    value={packingList.buyer}
-                    autoComplete='false'
-                    onChange={(e) =>
-                      setPackingList({
-                        ...packingList,
-                        buyer: e.target.value,
-                      })
-                    }
-                    label='Buyer'
-                  />
-                </Grid>
                 <Grid item lg={6}>
                   <div className='full'>
                     <Grid container spacing={2} className='w-full'>
                       <Grid item lg={12} className='flex justify-center'>
-                        <p className='h5 font-bold text-center'>
-                          Marks and Numbers
+                        <p className='h5 text-center font-bold'>
+                          Shipping Details
                         </p>
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          multiline
-                          minRows={3}
-                          value={packingList.type}
+                          value={shipment.consigne}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              type: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              consigne: e.target.value,
                             })
                           }
-                          label='Coffee Type'
+                          label='CONSIGNEE'
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          value={packingList.icoNumber}
+                          value={shipment.notifParty}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              icoNumber: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              notifParty: e.target.value,
                             })
                           }
-                          label='ICO#'
+                          label='Notify Party'
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          value={packingList.certNumbers}
+                          value={shipment.address}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              certNumbers: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              address: e.target.value,
                             })
                           }
-                          label='CERT Numbers (comma separated)'
-                        />
-                      </Grid>
-                      <Grid item lg={6} className='flex justify-center'>
-                        <TextField
-                          className='w-full'
-                          type='text'
-                          value={packingList.crop}
-                          autoComplete='false'
-                          onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              crop: e.target.value,
-                            })
-                          }
-                          label='Crop'
-                        />
-                      </Grid>
-                      <Grid item lg={6} className='flex justify-center'>
-                        <TextField
-                          className='w-full'
-                          type='number'
-                          value={packingList.mnNetWeight}
-                          autoComplete='false'
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position='start'>
-                                kg
-                              </InputAdornment>
-                            ),
-                          }}
-                          onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              mnNetWeight: e.target.value,
-                            })
-                          }
-                          label='Net Weight'
+                          label='Address'
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          value={packingList.destination}
+                          value={shipment.shipment}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              destination: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              shipment: e.target.value,
                             })
                           }
-                          label='Destination'
+                          label='Shipment'
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          value={packingList.contractNumber}
+                          value={shipment.portOfLoad}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              contractNumber: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              portOfLoad: e.target.value,
                             })
                           }
-                          label='Contract Number'
+                          label='Port of Loading'
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          value={packingList.reciever}
+                          value={shipment.portOfDischarge}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              reciever: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              portOfDischarge: e.target.value,
                             })
                           }
-                          label='For'
+                          label='Port of Discharge'
                         />
                       </Grid>
-                    </Grid>
-                  </div>
-                </Grid>
-                <Grid item lg={6}>
-                  <div className='full'>
-                    <Grid container spacing={2} className='w-full'>
+                      <Grid item lg={12} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='text'
+                          value={shipment.bookingNo}
+                          autoComplete='false'
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              bookingNo: e.target.value,
+                            })
+                          }
+                          label='Booking Number'
+                        />
+                      </Grid>
+                      <Grid item lg={12} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='text'
+                          value={shipment.shippingLine}
+                          autoComplete='false'
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              shippingLine: e.target.value,
+                            })
+                          }
+                          label='Shipping Line'
+                        />
+                      </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <p className='h5 text-center font-bold'>
                           Description of Packages and Goods
@@ -349,11 +325,11 @@ function NewPackingList() {
                           type='text'
                           multiline
                           minRows={3}
-                          value={packingList.description}
+                          value={shipment.description}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
+                            setShipment({
+                              ...shipment,
                               description: e.target.value,
                             })
                           }
@@ -363,23 +339,38 @@ function NewPackingList() {
                       <Grid item lg={6} className='flex justify-center'>
                         <TextField
                           className='w-full'
-                          type='number'
-                          value={packingList.noOfBags}
+                          type='text'
+                          value={shipment.icoNumber}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              noOfBags: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              icoNumber: e.target.value,
                             })
                           }
-                          label='Number of Bags'
+                          label='ICO#'
                         />
                       </Grid>
                       <Grid item lg={6} className='flex justify-center'>
                         <TextField
                           className='w-full'
+                          type='text'
+                          value={shipment.hsCode}
+                          autoComplete='false'
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              hsCode: e.target.value,
+                            })
+                          }
+                          label='HS CODE'
+                        />
+                      </Grid>
+                      <Grid item lg={12} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
                           type='number'
-                          value={packingList.bagWeight}
+                          value={shipment.descNetWeight}
                           autoComplete='false'
                           InputProps={{
                             endAdornment: (
@@ -389,53 +380,9 @@ function NewPackingList() {
                             ),
                           }}
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              bagWeight: e.target.value,
-                            })
-                          }
-                          label='One Bag Weight'
-                        />
-                      </Grid>
-                      <Grid item lg={6} className='flex justify-center'>
-                        <TextField
-                          className='w-full'
-                          type='number'
-                          value={packingList.grossWeight}
-                          autoComplete='false'
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position='start'>
-                                kg
-                              </InputAdornment>
-                            ),
-                          }}
-                          onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              grossWeight: e.target.value,
-                            })
-                          }
-                          label='Gross Weight'
-                        />
-                      </Grid>
-                      <Grid item lg={6} className='flex justify-center'>
-                        <TextField
-                          className='w-full'
-                          type='number'
-                          value={packingList.netWeight}
-                          autoComplete='false'
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position='start'>
-                                kg
-                              </InputAdornment>
-                            ),
-                          }}
-                          onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              netWeight: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              descNetWeight: e.target.value,
                             })
                           }
                           label='Net Weight'
@@ -446,46 +393,175 @@ function NewPackingList() {
                           className='w-full'
                           type='text'
                           multiline
-                          minRows={4}
-                          value={packingList.quantity}
+                          minRows={3}
+                          value={shipment.packing}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              quantity: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              packing: e.target.value,
                             })
                           }
-                          label='Quantity'
+                          label='Packing'
+                        />
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Grid>
+                <Grid item lg={6}>
+                  <div className='full'>
+                    <Grid container spacing={2} className='w-full'>
+                      <Grid item lg={12} className='flex justify-center'>
+                        <p className='h5 text-center font-bold'>
+                          Marks and Numbers
+                        </p>
+                      </Grid>
+                      <Grid item lg={12} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='text'
+                          multiline
+                          minRows={2}
+                          value={shipment.name}
+                          autoComplete='false'
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              name: e.target.value,
+                            })
+                          }
+                          label='Coffee Type'
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          value={packingList.container}
+                          value={shipment.certNumbers}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
-                              container: e.target.value,
+                            setShipment({
+                              ...shipment,
+                              certNumbers: e.target.value,
                             })
                           }
-                          label='Container'
+                          label='CERT Numbers (separated by comma)'
+                        />
+                      </Grid>
+                      <Grid item lg={12} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='number'
+                          value={shipment.mnNetWeight}
+                          autoComplete='false'
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='start'>
+                                kg
+                              </InputAdornment>
+                            ),
+                          }}
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              mnNetWeight: e.target.value,
+                            })
+                          }
+                          label='Net Weight'
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-center'>
                         <TextField
                           className='w-full'
                           type='text'
-                          value={packingList.transportation}
+                          value={shipment.destination}
                           autoComplete='false'
                           onChange={(e) =>
-                            setPackingList({
-                              ...packingList,
+                            setShipment({
+                              ...shipment,
+                              destination: e.target.value,
+                            })
+                          }
+                          label='Destination'
+                        />
+                      </Grid>
+                      <Grid item lg={12} className='flex justify-center'>
+                        <p className='h5 text-center font-bold'>
+                          Package, Weight & Transport Details
+                        </p>
+                      </Grid>
+                      <Grid item lg={6} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='number'
+                          value={shipment.grossWeight}
+                          autoComplete='false'
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='start'>
+                                kg
+                              </InputAdornment>
+                            ),
+                          }}
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              grossWeight: e.target.value,
+                            })
+                          }
+                          label='Gross Weight'
+                        />
+                      </Grid>
+                      <Grid item lg={6} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='number'
+                          value={shipment.netWeight}
+                          autoComplete='false'
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='start'>
+                                kg
+                              </InputAdornment>
+                            ),
+                          }}
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              netWeight: e.target.value,
+                            })
+                          }
+                          label='Net Weight'
+                        />
+                      </Grid>
+                      <Grid item lg={6} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='number'
+                          value={shipment.noOfBags}
+                          autoComplete='false'
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
+                              noOfBags: e.target.value,
+                            })
+                          }
+                          label='Number of Bags'
+                        />
+                      </Grid>
+                      <Grid item lg={6} className='flex justify-center'>
+                        <TextField
+                          className='w-full'
+                          type='text'
+                          value={shipment.transportation}
+                          autoComplete='false'
+                          onChange={(e) =>
+                            setShipment({
+                              ...shipment,
                               transportation: e.target.value,
                             })
                           }
-                          label='Means of Transportation'
+                          label='Transportation'
                         />
                       </Grid>
                     </Grid>
@@ -501,4 +577,4 @@ function NewPackingList() {
   );
 }
 
-export default NewPackingList;
+export default UpdateShipmentInstructions;

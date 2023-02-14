@@ -7,31 +7,23 @@ import {
   LinearProgress,
   IconButton,
   Modal,
-  Slide,
   Fab,
-  Backdrop,
   TableContainer,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableRow,
-  TableHead,
   tableCellClasses,
-  tableClasses,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Close, NoteAdd, Print } from '@mui/icons-material';
-import { BootstrapTooltip } from '../../components/admin/accountsList';
-import {
-  emptyErrors,
-  getPackings,
-  getShippings,
-} from '../../actions/generalActions';
-import { CustomNoRowsOverlay } from '../../components/noRowsOverlay';
+import { BootstrapTooltip } from '../../../components/admin/accountsList';
+import { emptyErrors, getPackings } from '../../../actions/generalActions';
+import { CustomNoRowsOverlay } from '../../../components/noRowsOverlay';
 import ReactToPrint from 'react-to-print';
 import { toast, ToastContainer } from 'react-toastify';
-import { fabStyle } from '../admin/cuppingAdmin';
+import { fabStyle } from '../../admin/cuppingAdmin';
 
 function PackingLists() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
@@ -124,11 +116,11 @@ function PackingLists() {
           />
         </Grid>
       </Grid>
-      {/* <Modal open={invoiceModalOpen} onClose={() => setInvoiceModalOpen(false)}>
+      <Modal open={invoiceModalOpen} onClose={() => setInvoiceModalOpen(false)}>
         <>
           <div
             className='h-screen w-fit overflow-auto'
-            style={{ marginLeft: '5%' }}
+            style={{ marginLeft: '15%' }}
           >
             {selectedPackingList ? (
               <Grid
@@ -137,7 +129,7 @@ function PackingLists() {
               >
                 <Grid className='title-container w-full text-center mb-6 mt-10'>
                   <p className='h3 font-bold underline text-center text-black'>
-                    Shipment Instruction
+                    Packing List
                   </p>
                 </Grid>
                 <TableContainer
@@ -158,77 +150,9 @@ function PackingLists() {
                   >
                     <TableBody sx={{ width: '100%' }}>
                       <TableRow>
-                        <TableCell
-                          sx={{ width: '100%' }}
-                          className='border-none'
-                        >
-                          <strong>Name: </strong>
-                          COFFEENET TRADING PLC
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
                         <TableCell sx={{ width: '100%' }}>
-                          <strong>TEL: </strong>
-                          +251913128964
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>EMAIL: </strong>
-                          coffeenet@gmail.com
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>PO BOX: </strong>
-                          N/A
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>CITY, COUNTRY: </strong>
-                          Addis Ababa, Ethiopia
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>CONSIGNEE: </strong>
-                          {selectedPackingList.consigne}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>NOFIFY PARTY: </strong>
-                          {selectedPackingList.notifParty}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>ADDRESS: </strong>
-                          {selectedPackingList.address}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>SHIPMENT: </strong>
-                          {selectedPackingList.shipment}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>PORT OF LOADING: </strong>
-                          {selectedPackingList.portOfLoad}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          <strong>PORT OF DISCHARGE: </strong>
-                          {selectedPackingList.portOfDischarge}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ width: '100%' }}>
-                          {selectedPackingList.shippingLine}
+                          <strong>Buyer: </strong>
+                          {selectedPackingList.buyer}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -239,6 +163,7 @@ function PackingLists() {
                       [`& .${tableCellClasses.root}`]: {
                         borderBottom: 'none',
                         borderRight: '1px solid gray',
+                        borderLeft: '1px solid gray',
                       },
                     }}
                   >
@@ -247,10 +172,10 @@ function PackingLists() {
                         <strong>Marks and Numbers</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Package</strong>
+                        <strong>Description of Goods</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Description of Packages and Goods</strong>
+                        <strong>Quantity</strong>
                       </TableCell>
                       <TableCell>
                         <strong>Net Weight(Kg)</strong>
@@ -261,34 +186,44 @@ function PackingLists() {
                     </TableRow>
                     <TableBody>
                       <TableRow>
-                        <TableCell>{selectedPackingList.name}</TableCell>
-                        <TableCell>{selectedPackingList.noOfBags} Bags</TableCell>
+                        <TableCell>{selectedPackingList.type}</TableCell>
                         <TableCell>{selectedPackingList.description}</TableCell>
-                        <TableCell>{selectedPackingList.netWeight} KGs</TableCell>
+                        <TableCell rowSpan={5}>
+                          {selectedPackingList.quantity}
+                        </TableCell>
+                        <TableCell>
+                          {selectedPackingList.netWeight} KGs
+                        </TableCell>
                         <TableCell>
                           {selectedPackingList.grossWeight} KGs
                         </TableCell>
                       </TableRow>
                       <TableRow>
-                        {selectedPackingList.certNumbers.map((cert) => {
-                          return (
-                            <>
-                              <TableCell>
-                                <p>
-                                  <strong>CERT #: </strong>
-                                  {cert}
-                                </p>
-                              </TableCell>
-                              <TableCell></TableCell>
-                              <TableCell>
-                                <p>
-                                  <strong>CERT #: </strong>
-                                  {cert}
-                                </p>
-                              </TableCell>
-                            </>
-                          );
-                        })}
+                        <TableCell>
+                          <strong>ICO #: </strong>
+                          {selectedPackingList.icoNumber}
+                        </TableCell>
+                        <TableCell>
+                          {selectedPackingList.noOfBags} Bags of{' '}
+                          {selectedPackingList.bagWeight}Kgs Net each bag
+                        </TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          rowSpan={selectedPackingList.certNumbers.length - 1}
+                        >
+                          {selectedPackingList.certNumbers.map((cert) => {
+                            return (
+                              <p>
+                                <strong>CERT #: </strong>
+                                {cert}
+                              </p>
+                            );
+                          })}
+                        </TableCell>
+                        <TableCell>{selectedPackingList.container}</TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
                       </TableRow>
@@ -299,12 +234,9 @@ function PackingLists() {
                             {selectedPackingList.mnNetWeight} KGs
                           </p>
                         </TableCell>
-                        <TableCell></TableCell>
                         <TableCell>
-                          <p>
-                            <strong>ICO #: </strong>
-                            {selectedPackingList.icoNumber}Kg
-                          </p>
+                          As per confirmation of contract number:{' '}
+                          {selectedPackingList.contractNumber}
                         </TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
@@ -312,57 +244,82 @@ function PackingLists() {
                       <TableRow>
                         <TableCell>
                           <p>
-                            <strong>Destination: </strong>
-                            {selectedPackingList.destination}
+                            <strong>Crop: </strong>
+                            {selectedPackingList.crop}
                           </p>
                         </TableCell>
-                        <TableCell></TableCell>
                         <TableCell>
-                          <p>
-                            <strong>HS CODE: </strong>
-                            {selectedPackingList.hsCode}
-                          </p>
+                          <p>{selectedPackingList.contractDate}</p>
                         </TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
+                      <TableRow className='border-b border-black'>
                         <TableCell>
                           <p>
-                            <strong>Net Weight: </strong>
-                            {selectedPackingList.descNetWeight} KGs
+                            <strong>Dest: </strong>
+                            {selectedPackingList.destination} KGs
                           </p>
                         </TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-                        <TableCell>
-                          <p>
-                            <strong>Packing: </strong>
-                            {selectedPackingList.packing}
-                          </p>
-                        </TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
                       </TableRow>
                     </TableBody>
-                    <TableRow className='border border-black'>
-                      <TableCell colSpan={2}></TableCell>
-                      <TableCell>
-                        <strong>{selectedPackingList.transportation}</strong>
-                      </TableCell>
-                      <TableCell colSpan={2}>
-                        <p>
+                  </Table>
+                  <Table
+                    size='small'
+                    sx={{
+                      [`& .${tableCellClasses.root}`]: {
+                        borderBottom: 'none',
+                      },
+                    }}
+                    className='shadow-none'
+                  >
+                    <TableBody sx={{ width: '100%' }}>
+                      <TableRow>
+                        <TableCell>
+                          <strong>Total Gross Weight: </strong>
+                          {selectedPackingList.grossWeight}KGs
+                        </TableCell>
+                        <TableCell>
                           <strong>Total Net Weight: </strong>
-                          {selectedPackingList.descNetWeight} KGs
-                        </p>
-                      </TableCell>
-                    </TableRow>
+                          {selectedPackingList.netWeight}KGs
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <strong>Packing in pack of: </strong>
+                          {selectedPackingList.bagWeight}Kgs
+                        </TableCell>
+                        <TableCell>
+                          <strong>Total Number of bags: </strong>
+                          {selectedPackingList.noOfBags}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <strong>Mean of Transport: </strong>
+                          {selectedPackingList.transportation}
+                        </TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <strong>Port of Destination: </strong>
+                          {selectedPackingList.destination}
+                        </TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell sx={{ textAlign: 'right' }}>
+                          <strong>For: </strong>
+                          {selectedPackingList.reciever}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
                   </Table>
                 </TableContainer>
               </Grid>
@@ -387,7 +344,7 @@ function PackingLists() {
             />
           </div>
         </>
-      </Modal> */}
+      </Modal>
       <ToastContainer />
     </>
   );

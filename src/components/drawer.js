@@ -35,6 +35,16 @@ import {
   HourglassTop,
   DirectionsBoat,
   LocalShipping,
+  Sell,
+  BrandingWatermark,
+  FileOpen,
+  ScaleOutlined,
+  CurrencyExchangeOutlined,
+  PriceChangeOutlined,
+  PaidOutlined,
+  ArchiveOutlined,
+  DiamondOutlined,
+  WarehouseOutlined,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { getActiveAccs, getPendingAccs } from '../actions/adminActions';
@@ -46,6 +56,7 @@ function MainDrawer() {
     user,
     admin,
     docManager,
+    financer,
     isAuthenticated,
     isAdminAuthenticated,
     isFinancerAuthenticated,
@@ -85,6 +96,10 @@ function MainDrawer() {
         docManager &&
         Object.keys(docManager).length ? (
         <DocManagerDrawer drawerIn={drawerIn} open={open} setOpen={setOpen} />
+      ) : isFinancerAuthenticated &&
+        financer &&
+        Object.keys(financer).length ? (
+        <FinancerDrawer drawerIn={drawerIn} open={open} setOpen={setOpen} />
       ) : null}
     </>
   );
@@ -871,6 +886,106 @@ const DocManagerDrawer = ({ drawerIn, open, setOpen }) => {
                 </ListItemButton>
               </ListItem>
             </Link>
+            <Link to='/way-bills'>
+              <ListItem disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Sell />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Way Bills'
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to='/certificates'>
+              <ListItem disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <BrandingWatermark />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Inland Cert.'
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to='/shipper-declerations'>
+              <ListItem disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <FileOpen />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Shippers Dec.'
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to='/weight-notes'>
+              <ListItem disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <ScaleOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Weight Notes'
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
           </List>
           <Divider />
         </Drawer>
@@ -879,4 +994,209 @@ const DocManagerDrawer = ({ drawerIn, open, setOpen }) => {
   );
 };
 
+const FinancerDrawer = ({ drawerIn, open, setOpen }) => {
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Slide direction='right' in={drawerIn}>
+      <Box sx={{ display: 'flex' }}>
+        <Drawer variant='permanent' open={open}>
+          <DrawerHeader>
+            {open ? (
+              <IconButton onClick={handleDrawerClose}>
+                <ChevronLeft />
+              </IconButton>
+            ) : (
+              <IconButton onClick={handleDrawerOpen}>
+                <ChevronRight />
+              </IconButton>
+            )}
+          </DrawerHeader>
+          <Divider />
+          <List>
+            <Link to='/doc-dashboard'>
+              <ListItem disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Speed />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Dashboard'
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to='/expense'>
+              <ListItem disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <CurrencyExchangeOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Expense'
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to='/expense'>
+              <ListItem disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <PriceChangeOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Revenue'
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          </List>
+          <Link to='/cost'>
+            <ListItem disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <PaidOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  sx={{ opacity: open ? 1 : 0 }}
+                  primary='Purchase'
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link to='/inventory'>
+            <ListItem disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <ArchiveOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  sx={{ opacity: open ? 1 : 0 }}
+                  primary='Inventory'
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link to='/asset'>
+            <ListItem disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <DiamondOutlined />
+                </ListItemIcon>
+                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary='Asset' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link to='/warehouse'>
+            <ListItem disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <WarehouseOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  sx={{ opacity: open ? 1 : 0 }}
+                  primary='Warehouse'
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Divider />
+        </Drawer>
+      </Box>
+    </Slide>
+  );
+};
 export default MainDrawer;

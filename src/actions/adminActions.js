@@ -12,6 +12,7 @@ import {
   ADD_CUPPING,
   ADD_LOADING,
   BASE_URL,
+  DATA_UPDATED,
 } from './types';
 
 // Get active accounts
@@ -297,6 +298,14 @@ export const addCupping =
       dispatch({
         type: ADD_CUPPING,
         payload: res.data,
+      });
+      dispatch({
+        type: ADD_CUPPING,
+        payload: res.data,
+      });
+      dispatch({
+        type: DATA_UPDATED,
+        payload: 'cupping added',
       });
     } catch (err) {
       dispatch({

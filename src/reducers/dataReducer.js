@@ -25,6 +25,10 @@ import {
   GET_INVOICES,
   GET_SHIPPING,
   GET_PACKING,
+  GET_WAYBILLS,
+  GET_CERTS,
+  GET_SHIPDECS,
+  GET_WEIGHTNOTES,
 } from '../actions/types';
 
 const initialState = {
@@ -39,6 +43,10 @@ const initialState = {
   invoices: [],
   shippingInstructions: [],
   packingLists: [],
+  wayBills: [],
+  certificates: [],
+  shipDecs: [],
+  weightNotes: [],
   loading: false,
   addDataLoading: false,
   dataUpdated: null,
@@ -146,6 +154,30 @@ export const dataReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         packingLists: payload,
+      };
+    case GET_WAYBILLS:
+      return {
+        ...state,
+        loading: false,
+        wayBills: payload,
+      };
+    case GET_CERTS:
+      return {
+        ...state,
+        loading: false,
+        certificates: payload,
+      };
+    case GET_SHIPDECS:
+      return {
+        ...state,
+        loading: false,
+        shipDecs: payload,
+      };
+    case GET_WEIGHTNOTES:
+      return {
+        ...state,
+        loading: false,
+        weightNotes: payload,
       };
     case GET_OFFICEMATS:
       return {

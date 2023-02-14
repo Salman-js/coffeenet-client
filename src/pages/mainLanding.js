@@ -33,7 +33,7 @@ function MainLanding() {
       navigate('/dashboard-admin');
     }
     if (isFinancerAuthenticated) {
-      navigate('/financer-dashboard');
+      navigate('/fin-dashboard');
     }
     if (isDocmanagerAuthenticated) {
       navigate('/doc-dashboard');

@@ -87,6 +87,10 @@ function TopNav() {
         docManager &&
         Object.keys(docManager).length ? (
         <DocManagerNav docManager={docManager} />
+      ) : isFinancerAuthenticated &&
+        financer &&
+        Object.keys(financer).length ? (
+        <FinancerNav financer={financer} />
       ) : (
         <NoLoggedNav loading={loading} errors={errors} />
       )}
@@ -426,6 +430,82 @@ const UserNav = ({ user }) => {
                 <ListItemText
                   primary={user.fname + ' ' + user.lname}
                   secondary={user.email}
+                />
+              </ListItem>
+            </MenuItem>
+            <MenuItem
+              className='text-red-400 px-4 py-2'
+              onClick={() => dispatch(logout())}
+            >
+              <ListItemIcon>
+                <Logout sx={{ color: '#eb7563' }} fontSize='small' />
+              </ListItemIcon>
+              Logout
+            </MenuItem>
+          </Menu>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const FinancerNav = ({ financer }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  // const [search, setSearch] = useState('');
+  const menuOpen = Boolean(anchorEl);
+  const dispatch = useDispatch();
+  const showPopOver = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  return (
+    <>
+      <div className='navbar'>
+        <div className='nav-logo-container'>
+          <img src='./assets/logo.png' width='50px' alt='' />
+        </div>
+        <div className='nav-menu-container my-auto'>
+          <IconButton size='small' onClick={showPopOver}>
+            <Avatar sx={{ width: 30, height: 30 }}>
+              {financer.fname.charAt(0)}
+            </Avatar>
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={menuOpen}
+            onClose={() => setAnchorEl(null)}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                color: '#2d384e',
+                bgcolor: '#ffffff',
+                '& .MuiAvatar-root': {},
+                '&:before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 14,
+                  right: -5,
+                  width: 10,
+                  height: 10,
+                  bgcolor: '#fffdfd',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'middle' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+          >
+            <MenuItem>
+              <ListItem disablePadding>
+                <ListItemAvatar>
+                  <Avatar>{financer.fname.charAt(0)}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={financer.fname + ' ' + financer.lname}
+                  secondary={financer.email}
                 />
               </ListItem>
             </MenuItem>

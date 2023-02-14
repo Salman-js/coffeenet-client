@@ -10,8 +10,8 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { Description, Send, RestartAltRounded } from '@mui/icons-material';
-import { addInvoice } from '../../actions/docmanagerActions';
-import { emptyErrors, resetUpdate } from '../../actions/generalActions';
+import { addInvoice } from '../../../actions/docmanagerActions';
+import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
