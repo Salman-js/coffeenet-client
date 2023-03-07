@@ -18,7 +18,7 @@ import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LocalizationProvider, MobileDatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 function NewShippersDecleration() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
@@ -77,12 +77,8 @@ function NewShippersDecleration() {
     delete newDec.noOfBagsArray;
     delete newDec.sealNumbersArray;
     newDec.createdAt = new Date().getTime();
-    newDec.blDate = `${shipDec.blDate.getDate()} / ${
-      shipDec.blDate.getMonth() + 1
-    }/${shipDec.blDate.getFullYear()}`;
-    newDec.osDate = `${shipDec.osDate.getDate()} / ${
-      shipDec.osDate.getMonth() + 1
-    }/${shipDec.osDate.getFullYear()}`;
+    newDec.blDate = shipDec.blDate.format('DD/MM/YYYY');
+    newDec.osDate = shipDec.blDate.format('DD/MM/YYYY');
     setShipDec(newDec);
     dispatch(addShipDec(shipDec));
     console.log(shipDec);
@@ -341,7 +337,7 @@ function NewShippersDecleration() {
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='Date'
@@ -426,7 +422,7 @@ function NewShippersDecleration() {
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='Date'

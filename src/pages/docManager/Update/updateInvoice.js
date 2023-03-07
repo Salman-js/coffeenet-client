@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import {
-  Grid,
-  Button,
-  TextField,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Grid, Button, TextField, InputAdornment } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { Description, Send, RestartAltRounded } from '@mui/icons-material';
-import { addInvoice } from '../../../actions/docmanagerActions';
-import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
+import { Check } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { BASE_URL } from '../../../actions/types';
+import axios from 'axios';
 
 function UpdateInvoice() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
-  const { addDataLoading, dataUpdated } = useSelector(
-    (state) => state.adminData
-  );
-  const errors = useSelector((state) => state.errors);
+  const [updateData, setUpdateData] = useState({
+    loading: false,
+    addDataLoading: false,
+    updateSuccess: false,
+  });
+  const [errors, setErrors] = useState(null);
+  const { id } = useParams();
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth()}/${Day.getFullYear()}`;
   const [invoice, setInvoice] = useState({
@@ -56,13 +53,76 @@ function UpdateInvoice() {
     createdAt: '',
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [validated, setValidated] = useState(false);
-  function onAddInvoice(e) {
+  function onUpdateInvoice(e) {
     e.preventDefault();
-    dispatch(addInvoice(invoice));
+    updateDoc('commercialinvoices', invoice);
   }
 
+  const updateDoc = async (table, invoice) => {
+    setUpdateData({
+      ...updateData,
+      addDataLoading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+
+    const body = JSON.stringify(invoice);
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/document/update/${table}`,
+        body,
+        config
+      );
+      setUpdateData({
+        ...updateData,
+        addDataLoading: false,
+        updateSuccess: true,
+      });
+    } catch (err) {
+      setErrors(err.response.data);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+        addDataLoading: false,
+      });
+    }
+  };
+  const getDataById = async (table, id) => {
+    setUpdateData({
+      ...updateData,
+      loading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+    try {
+      let res = await axios.get(
+        `${BASE_URL}/api/document/${table}/${id}`,
+        config
+      );
+      setInvoice(res.data[0]);
+      console.log(invoice);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+      });
+    } catch (err) {
+      console.log(err);
+      setErrors(err.response.data);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+      });
+    }
+  };
   useEffect(() => {
     if (!isDocmanagerAuthenticated) {
       navigate('/');
@@ -76,13 +136,13 @@ function UpdateInvoice() {
       draggable: true,
       theme: 'light',
     };
-    if (Object.keys(errors).length > 0 && errors.unknown) {
+    if (errors && Object.keys(errors).length > 0 && errors.unknown) {
       toast.error('Unknown Error, Please Try Again', toastOptions);
       setTimeout(() => {
-        dispatch(emptyErrors());
+        setErrors(null);
       }, 8000);
     }
-  }, [errors, dispatch]);
+  }, [errors]);
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -91,13 +151,16 @@ function UpdateInvoice() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'Invoice added') {
-      toast.success('Invoice submitted', toastOptions);
+    if (updateData.updateSuccess) {
+      toast.success('Data updated', toastOptions);
       setTimeout(() => {
-        dispatch(resetUpdate());
+        setUpdateData({
+          ...updateData,
+          updateSuccess: false,
+        });
       }, 8000);
     }
-  }, [dataUpdated, dispatch]);
+  }, [updateData]);
   useEffect(() => {
     setValidated(
       Object.values(invoice).every((value) => {
@@ -107,89 +170,49 @@ function UpdateInvoice() {
         return true;
       })
     );
-    setInvoice({
-      ...invoice,
-      createdAt: new Date().getTime(),
-      totalPrice: (
-        parseFloat(invoice.unitPrice) *
-        (parseFloat(invoice.netWeight) * 2.20462)
-      ).toFixed(3),
-    });
   }, [invoice]);
   useEffect(() => {
     if (!isDocmanagerAuthenticated) {
       navigate('/');
     }
   }, [isDocmanagerAuthenticated, navigate]);
+  useEffect(() => {
+    getDataById('commercialinvoices', id);
+  }, [id]);
   return (
     <>
       <Grid container className='dashboard-container justify-around'>
-        <form onSubmit={onAddInvoice} className='w-full'>
+        <form onSubmit={onUpdateInvoice} className='w-full'>
           <Grid className='accounts-list-container w-full -mt-3'>
             <div className='w-full flex flex-row justify-between mb-2'>
-              <p className='h4 text-left'>Invoices</p>
+              <p className='h4 text-left'>Update Invoice</p>
               <div className='flex flex-row'>
-                <IconButton
-                  variant='contained'
-                  onClick={() => {
-                    setInvoice({
-                      reciever: '',
-                      terms: '',
-                      port: '',
-                      dest: '',
-                      noOfBags: '',
-                      incoTerms: '',
-                      benBank: '',
-                      swiftCode: '',
-                      corBank: '',
-                      benName: '',
-                      accNo: '',
-                      address: '',
-                      packing: '',
-                      coo: '',
-                      consigne: '',
-                      exporter: '',
-                      contractNo: '',
-                      contractDate: newDate,
-                      pmName: '',
-                      pmICO: '',
-                      pmCert: '',
-                      pmNetWeight: '',
-                      pmCrop: '',
-                      pmDest: '',
-                      description: '',
-                      grossWeight: '',
-                      netWeight: '',
-                      unitPrice: '',
-                      totalPrice: '',
-                      createdAt: '',
-                    });
-                  }}
-                >
-                  <RestartAltRounded />
-                </IconButton>
+                <div>
+                  <Button
+                    variant='contained'
+                    sx={{
+                      backgroundColor: 'gray',
+                      '&:hover': {
+                        backgroundColor: '#6b6a6a',
+                      },
+                    }}
+                    onClick={() => navigate('/invoices')}
+                  >
+                    Cancel
+                  </Button>
+                </div>
                 <LoadingButton
                   type='submit'
                   variant='contained'
-                  loading={addDataLoading}
+                  loading={updateData.addDataLoading}
                   sx={{
-                    mr: 5,
-                    ml: 5,
+                    ml: 3,
                   }}
                   disabled={!validated}
-                  startIcon={<Send />}
+                  startIcon={<Check />}
                 >
                   Submit
                 </LoadingButton>
-                <div>
-                  <Button
-                    startIcon={<Description />}
-                    variant='contained'
-                    onClick={() => navigate('/invoices')}
-                  >
-                    View Invoices
-                  </Button>
-                </div>
               </div>
             </div>
           </Grid>

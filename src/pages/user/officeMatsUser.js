@@ -17,7 +17,7 @@ import { Add } from '@mui/icons-material';
 import { Loader } from '../../components/admin/accountsList';
 import { getOfficeMats } from '../../actions/generalActions';
 import { addOfficeMat } from '../../actions/userActions';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { CustomNoRowsOverlay } from '../../components/noRowsOverlay';
@@ -182,7 +182,7 @@ function OfficeMatsUser() {
                     />
                   </Grid>
                   <Grid item lg={12}>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DesktopDatePicker
                         className='w-full'
                         label='Date of Purchase'

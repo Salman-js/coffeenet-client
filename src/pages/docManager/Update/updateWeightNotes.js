@@ -16,9 +16,10 @@ import { Add, Check } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LocalizationProvider, MobileDatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import axios from 'axios';
 import { BASE_URL } from '../../../actions/types';
+import moment from 'moment';
 
 function UpdateWeightNote() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
@@ -78,10 +79,7 @@ function UpdateWeightNote() {
     delete newDec.netWeightsArray;
     delete newDec.noOfBagsArray;
     delete newDec.sealNumbersArray;
-    newDec.createdAt = new Date().getTime();
-    newDec.blDate = `${weightNote.blDate.getDate()}/${
-      weightNote.blDate.getMonth() + 1
-    }/${weightNote.blDate.getFullYear()}`;
+    newDec.blDate = weightNote.blDate.format('DD/MM/YYYY');
     setWeightNote(newDec);
     updateDoc('weightnotes', weightNote);
     setWeightNote({
@@ -91,7 +89,7 @@ function UpdateWeightNote() {
       noOfBagsArray: arrays.noOfBagsArray,
       grossWeightsArray: arrays.grossWeightsArray,
       netWeightsArray: arrays.netWeightsArray,
-      blDate: new Date(newDec.blDate.replace(' ', '')),
+      blDate: moment(weightNote.blDate, 'DD/MM/YYYY'),
     });
   }
   const updateDoc = async (table, weightNote) => {
@@ -144,7 +142,7 @@ function UpdateWeightNote() {
       res.data[0].noOfBagsArray = res.data[0].noOfBags.split(',');
       res.data[0].grossWeightsArray = res.data[0].grossWeights.split(',');
       res.data[0].netWeightsArray = res.data[0].netWeights.split(',');
-      res.data[0].blDate = new Date(res.data[0].blDate);
+      res.data[0].blDate = moment(res.data[0].blDate, 'DD/MM/YYYY');
       setWeightNote(res.data[0]);
       setUpdateData({
         ...updateData,
@@ -445,7 +443,7 @@ function UpdateWeightNote() {
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='Date'

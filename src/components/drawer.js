@@ -45,6 +45,8 @@ import {
   ArchiveOutlined,
   DiamondOutlined,
   WarehouseOutlined,
+  PriceCheckOutlined,
+  RequestQuoteOutlined,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { getActiveAccs, getPendingAccs } from '../actions/adminActions';
@@ -1045,31 +1047,104 @@ const FinancerDrawer = ({ drawerIn, open, setOpen }) => {
                 </ListItemButton>
               </ListItem>
             </Link>
-            <Link to='/expense'>
-              <ListItem disablePadding sx={{ display: 'block' }}>
-                <ListItemButton
+            <ListItem disablePadding sx={{ display: 'block' }}>
+              <Accordion
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 'auto' : 6,
+                  justifyContent: 'center',
+                }}
+                className='p-0 shadow-none w-full bg-slate-400'
+              >
+                <AccordionSummary
                   sx={{
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
+                    display: open ? '' : 'block',
                   }}
+                  expandIcon={open ? <ExpandMore /> : null}
+                  className='p-0 w-full'
                 >
-                  <ListItemIcon
+                  <ListItemButton
                     sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center',
+                      minHeight: 48,
+                      justifyContent: open ? 'initial' : 'center',
+                      px: 2.5,
                     }}
                   >
-                    <CurrencyExchangeOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                    sx={{ opacity: open ? 1 : 0 }}
-                    primary='Expense'
-                  />
-                </ListItemButton>
-              </ListItem>
-            </Link>
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: open ? 3 : 'auto',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <CurrencyExchangeOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{ opacity: open ? 1 : 0 }}
+                      primary='Expense'
+                    />
+                  </ListItemButton>
+                </AccordionSummary>
+                <AccordionDetails className='p-0 bg-slate-300'>
+                  <Link to='/expenses'>
+                    <ListItem disablePadding sx={{ display: 'block' }}>
+                      <ListItemButton
+                        sx={{
+                          minHeight: 48,
+                          justifyContent: open ? 'initial' : 'center',
+                          px: 2.5,
+                        }}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            minWidth: 0,
+                            mr: open ? 3 : 'auto',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <RequestQuoteOutlined />
+                        </ListItemIcon>
+                        <ListItemText
+                          sx={{ opacity: open ? 1 : 0 }}
+                          primary='Expenses List'
+                          primaryTypographyProps={{
+                            fontSize: 13,
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+                  <Link to='/new-expense'>
+                    <ListItem disablePadding sx={{ display: 'block' }}>
+                      <ListItemButton
+                        sx={{
+                          minHeight: 48,
+                          justifyContent: open ? 'initial' : 'center',
+                          px: 2.5,
+                        }}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            minWidth: 0,
+                            mr: open ? 3 : 'auto',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <PriceCheckOutlined />
+                        </ListItemIcon>
+                        <ListItemText
+                          sx={{ opacity: open ? 1 : 0 }}
+                          primary='Add Expense'
+                          primaryTypographyProps={{
+                            fontSize: 13,
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+                </AccordionDetails>
+              </Accordion>
+            </ListItem>
             <Link to='/expense'>
               <ListItem disablePadding sx={{ display: 'block' }}>
                 <ListItemButton

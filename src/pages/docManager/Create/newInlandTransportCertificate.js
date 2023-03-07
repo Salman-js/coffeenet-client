@@ -19,7 +19,7 @@ import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LocalizationProvider, MobileDatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 function NewInlandTransportCertificate() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
@@ -59,9 +59,7 @@ function NewInlandTransportCertificate() {
     e.preventDefault();
     let newCert = cert;
     newCert.createdAt = new Date().getTime();
-    newCert.blDate = `${cert.blDate.getDate()} / ${
-      cert.blDate.getMonth() + 1
-    }/${cert.blDate.getFullYear()}`;
+    newCert.blDate = cert.blDate.format('DD/MM/YYYY');
     setCert(newCert);
     dispatch(addCert(cert));
   }
@@ -280,7 +278,7 @@ function NewInlandTransportCertificate() {
                         />
                       </Grid>
                       <Grid item lg={6} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='BL Date'

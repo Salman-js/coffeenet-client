@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import {
-  Grid,
-  Button,
-  TextField,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Grid, Button, TextField, InputAdornment } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { Description, Send, RestartAltRounded } from '@mui/icons-material';
-import { addPacking } from '../../../actions/docmanagerActions';
-import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
+import { Check } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { BASE_URL } from '../../../actions/types';
 
 function UpdatePackingList() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
-  const { addDataLoading, dataUpdated } = useSelector(
-    (state) => state.adminData
-  );
-  const errors = useSelector((state) => state.errors);
+  const [updateData, setUpdateData] = useState({
+    loading: false,
+    addDataLoading: false,
+    updateSuccess: false,
+  });
+  const [errors, setErrors] = useState(null);
+  const { id } = useParams();
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
   const [packingList, setPackingList] = useState({
@@ -44,21 +41,69 @@ function UpdatePackingList() {
     reciever: '',
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [validated, setValidated] = useState(false);
-  function onAddPackingList(e) {
+  function onUpdatePackingList(e) {
     e.preventDefault();
     let newObj = packingList;
-    newObj.createdAt = new Date().getTime();
     setPackingList(newObj);
-    dispatch(addPacking(packingList));
+    updateDoc('packinglists', packingList);
   }
 
-  useEffect(() => {
-    if (!isDocmanagerAuthenticated) {
-      navigate('/');
+  const updateDoc = async (table, wayBill) => {
+    setUpdateData({
+      ...updateData,
+      addDataLoading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+
+    const body = JSON.stringify(wayBill);
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/document/update/${table}`,
+        body,
+        config
+      );
+      setUpdateData({
+        ...updateData,
+        addDataLoading: false,
+        updateSuccess: true,
+      });
+    } catch (err) {
+      setErrors(err.response.data);
     }
-  }, [isDocmanagerAuthenticated, navigate]);
+  };
+  const getDataById = async (table, id) => {
+    setUpdateData({
+      ...updateData,
+      loading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+    try {
+      let res = await axios.get(
+        `${BASE_URL}/api/document/${table}/${id}`,
+        config
+      );
+      setPackingList(res.data[0]);
+      console.log(packingList);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+      });
+    } catch (err) {
+      console.log(err);
+      setErrors(err.response.data);
+    }
+  };
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -67,13 +112,13 @@ function UpdatePackingList() {
       draggable: true,
       theme: 'light',
     };
-    if (Object.keys(errors).length > 0 && errors.unknown) {
+    if (errors && Object.keys(errors).length > 0 && errors.unknown) {
       toast.error('Unknown Error, Please Try Again', toastOptions);
       setTimeout(() => {
-        dispatch(emptyErrors());
+        setErrors(null);
       }, 8000);
     }
-  }, [errors, dispatch]);
+  }, [errors]);
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -82,13 +127,16 @@ function UpdatePackingList() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'Packing list added') {
-      toast.success('Packing list submitted', toastOptions);
+    if (updateData.updateSuccess) {
+      toast.success('Data updated', toastOptions);
       setTimeout(() => {
-        dispatch(resetUpdate());
+        setUpdateData({
+          ...updateData,
+          updateSuccess: false,
+        });
       }, 8000);
     }
-  }, [dataUpdated, dispatch]);
+  }, [updateData]);
   useEffect(() => {
     setValidated(
       Object.values(packingList).every((value) => {
@@ -104,63 +152,43 @@ function UpdatePackingList() {
       navigate('/');
     }
   }, [isDocmanagerAuthenticated, navigate]);
+  useEffect(() => {
+    getDataById('packinglists', id);
+  }, [id]);
   return (
     <>
       <Grid container className='dashboard-container justify-around'>
-        <form onSubmit={onAddPackingList} className='w-full'>
+        <form onSubmit={onUpdatePackingList} className='w-full'>
           <Grid className='accounts-list-container w-full -mt-3'>
             <div className='w-full flex flex-row justify-between mb-2'>
-              <p className='h4 text-left'>Packing Lists</p>
+              <p className='h4 text-left'>Update Packing List</p>
               <div className='flex flex-row'>
-                <IconButton
-                  variant='contained'
-                  onClick={() => {
-                    setPackingList({
-                      buyer: '',
-                      type: '',
-                      icoNumber: '',
-                      certNumbers: '',
-                      mnNetWeight: '',
-                      crop: '',
-                      destination: '',
-                      description: '',
-                      noOfBags: '',
-                      bagWeight: '',
-                      contractNumber: '',
-                      contractDate: newDate,
-                      container: '',
-                      quantity: '',
-                      grossWeight: '',
-                      netWeight: '',
-                      transportation: '',
-                      reciever: '',
-                    });
-                  }}
-                >
-                  <RestartAltRounded />
-                </IconButton>
+                <div>
+                  <Button
+                    variant='contained'
+                    sx={{
+                      backgroundColor: 'gray',
+                      '&:hover': {
+                        backgroundColor: '#6b6a6a',
+                      },
+                    }}
+                    onClick={() => navigate('/packing-lists')}
+                  >
+                    Cancel
+                  </Button>
+                </div>
                 <LoadingButton
                   type='submit'
                   variant='contained'
-                  loading={addDataLoading}
+                  loading={updateData.addDataLoading}
                   sx={{
-                    mr: 5,
-                    ml: 5,
+                    ml: 3,
                   }}
                   disabled={!validated}
-                  startIcon={<Send />}
+                  startIcon={<Check />}
                 >
                   Submit
                 </LoadingButton>
-                <div>
-                  <Button
-                    startIcon={<Description />}
-                    variant='contained'
-                    onClick={() => navigate('/packing-lists')}
-                  >
-                    View Packing Lists
-                  </Button>
-                </div>
               </div>
             </div>
           </Grid>

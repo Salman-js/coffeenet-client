@@ -17,7 +17,7 @@ import {
   tableCellClasses,
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Close, NoteAdd, Print } from '@mui/icons-material';
+import { Close, CreateOutlined, NoteAdd, Print } from '@mui/icons-material';
 import { BootstrapTooltip } from '../../../components/admin/accountsList';
 import { emptyErrors, getWaybills } from '../../../actions/generalActions';
 import { CustomNoRowsOverlay } from '../../../components/noRowsOverlay';
@@ -41,6 +41,9 @@ function WayBills() {
     setSelectedWayBill(selectedRow);
     setInvoiceModalOpen(true);
   }
+  function onEdit(selectedRow) {
+    navigate(`/update-wb/${selectedRow.id}`);
+  }
   const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'product', headerName: 'Product', width: 200 },
@@ -55,6 +58,22 @@ function WayBills() {
             <BootstrapTooltip title='Print'>
               <IconButton size='small' onClick={() => onPrint(params.row)}>
                 <Print />
+              </IconButton>
+            </BootstrapTooltip>
+          </div>
+        );
+      },
+    },
+    {
+      field: 'edit',
+      headerName: 'Edit',
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <div className='w-full flex justify-center'>
+            <BootstrapTooltip title='Edit'>
+              <IconButton size='small' onClick={() => onEdit(params.row)}>
+                <CreateOutlined />
               </IconButton>
             </BootstrapTooltip>
           </div>

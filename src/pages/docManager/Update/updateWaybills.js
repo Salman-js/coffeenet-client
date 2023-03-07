@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Grid, Button, TextField, IconButton } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { Description, Send, RestartAltRounded, Add } from '@mui/icons-material';
-import { addWaybill } from '../../../actions/docmanagerActions';
-import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
+import { Add, Check } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { BASE_URL } from '../../../actions/types';
 
 function UpdateWayBill() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
-  const { addDataLoading, dataUpdated } = useSelector(
-    (state) => state.adminData
-  );
-  const errors = useSelector((state) => state.errors);
+  const [updateData, setUpdateData] = useState({
+    loading: false,
+    addDataLoading: false,
+    updateSuccess: false,
+  });
+  const [errors, setErrors] = useState(null);
+  const { id } = useParams();
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
   const [wayBill, setWayBill] = useState({
@@ -30,26 +33,96 @@ function UpdateWayBill() {
     date: newDate,
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [validated, setValidated] = useState(false);
-  function onAddWayBill(e) {
+  function onUpdateWayBill(e) {
     e.preventDefault();
     let newBill = wayBill;
+    let arrays = {
+      containerNumbersArray: newBill.containerNumbersArray,
+      wagonNumbersArray: newBill.wagonNumbers,
+      sealNumbersArray: newBill.sealNumbersArray,
+    };
     delete newBill.containerNumbersArray;
     delete newBill.sealNumbersArray;
     delete newBill.wagonNumbersArray;
-    newBill.createdAt = new Date().getTime();
-    setWayBill(newBill);
-    console.log(wayBill);
-    dispatch(addWaybill(wayBill));
+    updateDoc('waybills', wayBill);
     setWayBill({
       ...wayBill,
-      containerNumbersArray: [''],
-      sealNumbersArray: [''],
-      wagonNumbersArray: [''],
+      containerNumbersArray: arrays.containerNumbersArray,
+      sealNumbersArray: arrays.sealNumbersArray,
+      wagonNumbersArray: arrays.wagonNumbersArray,
     });
   }
 
+  const updateDoc = async (table, wayBill) => {
+    setUpdateData({
+      ...updateData,
+      addDataLoading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+
+    const body = JSON.stringify(wayBill);
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/document/update/${table}`,
+        body,
+        config
+      );
+      setUpdateData({
+        ...updateData,
+        addDataLoading: false,
+        updateSuccess: true,
+      });
+    } catch (err) {
+      setErrors(err.response.data);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+        addDataLoading: false,
+      });
+    }
+  };
+  const getDataById = async (table, id) => {
+    setUpdateData({
+      ...updateData,
+      loading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+    try {
+      let res = await axios.get(
+        `${BASE_URL}/api/document/${table}/${id}`,
+        config
+      );
+      res.data[0].containerNumbersArray =
+        res.data[0].containerNumbers.split(',');
+      res.data[0].sealNumbersArray = res.data[0].sealNumbers.split(',');
+      res.data[0].wagonNumbersArray = res.data[0].wagonNumbers.split(',');
+      setWayBill(res.data[0]);
+      console.log(wayBill);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+      });
+    } catch (err) {
+      console.log(err);
+      setErrors(err.response.data);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+        addDataLoading: false,
+      });
+    }
+  };
   useEffect(() => {
     if (!isDocmanagerAuthenticated) {
       navigate('/');
@@ -63,13 +136,13 @@ function UpdateWayBill() {
       draggable: true,
       theme: 'light',
     };
-    if (Object.keys(errors).length > 0 && errors.unknown) {
+    if (errors && Object.keys(errors).length > 0 && errors.unknown) {
       toast.error('Unknown Error, Please Try Again', toastOptions);
       setTimeout(() => {
-        dispatch(emptyErrors());
+        setErrors(null);
       }, 8000);
     }
-  }, [errors, dispatch]);
+  }, [errors]);
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -78,13 +151,16 @@ function UpdateWayBill() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'Way bill added') {
-      toast.success('Way bill submitted', toastOptions);
+    if (updateData.updateSuccess) {
+      toast.success('Data updated', toastOptions);
       setTimeout(() => {
-        dispatch(resetUpdate());
+        setUpdateData({
+          ...updateData,
+          updateSuccess: false,
+        });
       }, 8000);
     }
-  }, [dataUpdated, dispatch]);
+  }, [updateData]);
   useEffect(() => {
     setValidated(
       Object.values(wayBill).every((value) => {
@@ -105,55 +181,43 @@ function UpdateWayBill() {
       navigate('/');
     }
   }, [isDocmanagerAuthenticated, navigate]);
+  useEffect(() => {
+    getDataById('waybills', id);
+  }, [id]);
   return (
     <>
       <Grid container className='dashboard-container justify-around'>
-        <form onSubmit={onAddWayBill} className='w-full'>
+        <form onSubmit={onUpdateWayBill} className='w-full'>
           <Grid className='accounts-list-container w-full -mt-3'>
             <div className='w-full flex flex-row justify-between mb-2'>
-              <p className='h4 text-left'>Way Bills</p>
+              <p className='h4 text-left'>Update Way Bill</p>
               <div className='flex flex-row'>
-                <IconButton
-                  variant='contained'
-                  onClick={() => {
-                    setWayBill({
-                      consigne: '',
-                      transportType: '',
-                      product: '',
-                      containerNumbers: '',
-                      sealNumbers: '',
-                      wagonNumbers: '',
-                      containerNumbersArray: [''],
-                      sealNumbersArray: [''],
-                      wagonNumbersArray: [''],
-                      date: newDate,
-                    });
-                  }}
-                >
-                  <RestartAltRounded />
-                </IconButton>
+                <div>
+                  <Button
+                    variant='contained'
+                    sx={{
+                      backgroundColor: 'gray',
+                      '&:hover': {
+                        backgroundColor: '#6b6a6a',
+                      },
+                    }}
+                    onClick={() => navigate('/way-bills')}
+                  >
+                    Cancel
+                  </Button>
+                </div>
                 <LoadingButton
                   type='submit'
                   variant='contained'
-                  loading={addDataLoading}
+                  loading={updateData.addDataLoading}
                   sx={{
-                    mr: 5,
-                    ml: 5,
+                    ml: 3,
                   }}
                   disabled={!validated}
-                  startIcon={<Send />}
+                  startIcon={<Check />}
                 >
                   Submit
                 </LoadingButton>
-                <div>
-                  <Button
-                    startIcon={<Description />}
-                    variant='contained'
-                    onClick={() => navigate('/way-bills')}
-                  >
-                    View Way Bills
-                  </Button>
-                </div>
               </div>
             </div>
           </Grid>

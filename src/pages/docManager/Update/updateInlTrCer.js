@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Grid,
   Button,
   TextField,
-  IconButton,
   FormControl,
   InputLabel,
   Select,
@@ -13,20 +12,24 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { Description, Send, RestartAltRounded } from '@mui/icons-material';
-import { addCert } from '../../../actions/docmanagerActions';
-import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
+import { Check } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LocalizationProvider, MobileDatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import axios from 'axios';
+import { BASE_URL } from '../../../actions/types';
+import moment from 'moment';
 
 function UpdateInlTrCert() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
-  const { addDataLoading, dataUpdated } = useSelector(
-    (state) => state.adminData
-  );
-  const errors = useSelector((state) => state.errors);
+  const [updateData, setUpdateData] = useState({
+    loading: false,
+    addDataLoading: false,
+    updateSuccess: false,
+  });
+  const [errors, setErrors] = useState(null);
+  const { id } = useParams();
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
   const [cert, setCert] = useState({
@@ -47,7 +50,6 @@ function UpdateInlTrCert() {
     date: newDate,
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [validated, setValidated] = useState(false);
   const blDateChange = (newValue) => {
     setCert({
@@ -59,13 +61,72 @@ function UpdateInlTrCert() {
     e.preventDefault();
     let newCert = cert;
     newCert.createdAt = new Date().getTime();
-    newCert.blDate = `${cert.blDate.getDate()} / ${
-      cert.blDate.getMonth() + 1
-    }/${cert.blDate.getFullYear()}`;
+    newCert.blDate = cert.blDate.format('DD/MM/YYYY');
     setCert(newCert);
-    dispatch(addCert(cert));
+    updateDoc('certificates', cert);
   }
 
+  const updateDoc = async (table, cert) => {
+    setUpdateData({
+      ...updateData,
+      addDataLoading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+
+    const body = JSON.stringify(cert);
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/document/update/${table}`,
+        body,
+        config
+      );
+      setUpdateData({
+        ...updateData,
+        addDataLoading: false,
+        updateSuccess: true,
+      });
+    } catch (err) {
+      setErrors(err.response.data);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+        addDataLoading: false,
+      });
+    }
+  };
+  const getDataById = async (table, id) => {
+    setUpdateData({
+      ...updateData,
+      loading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+    try {
+      let res = await axios.get(
+        `${BASE_URL}/api/document/${table}/${id}`,
+        config
+      );
+      res.data[0].blDate = moment(res.data[0].blDate, 'DD/MM/YYYY');
+      setCert(res.data[0]);
+      console.log(cert);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+      });
+    } catch (err) {
+      console.log(err);
+      setErrors(err.response.data);
+    }
+  };
   useEffect(() => {
     if (!isDocmanagerAuthenticated) {
       navigate('/');
@@ -79,13 +140,13 @@ function UpdateInlTrCert() {
       draggable: true,
       theme: 'light',
     };
-    if (Object.keys(errors).length > 0 && errors.unknown) {
+    if (errors && Object.keys(errors).length > 0 && errors.unknown) {
       toast.error('Unknown Error, Please Try Again', toastOptions);
       setTimeout(() => {
-        dispatch(emptyErrors());
+        setErrors(null);
       }, 8000);
     }
-  }, [errors, dispatch]);
+  }, [errors]);
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -94,13 +155,16 @@ function UpdateInlTrCert() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'cert added') {
-      toast.success('Inland Transport Certificate submitted', toastOptions);
+    if (updateData.updateSuccess) {
+      toast.success('Data updated', toastOptions);
       setTimeout(() => {
-        dispatch(resetUpdate());
+        setUpdateData({
+          ...updateData,
+          updateSuccess: false,
+        });
       }, 8000);
     }
-  }, [dataUpdated, dispatch]);
+  }, [updateData]);
   useEffect(() => {
     setValidated(
       Object.values(cert).every((value) => {
@@ -116,60 +180,45 @@ function UpdateInlTrCert() {
       navigate('/');
     }
   }, [isDocmanagerAuthenticated, navigate]);
+  useEffect(() => {
+    getDataById('certificates', id);
+  }, [id]);
   return (
     <>
       <Grid container className='dashboard-container justify-around'>
         <form onSubmit={onAddCertificate} className='w-full'>
           <Grid className='accounts-list-container w-full -mt-3'>
             <div className='w-full flex flex-row justify-between mb-2'>
-              <p className='h4 text-left'>Inland Transport Certificates</p>
+              <p className='h4 text-left'>
+                Update Inland Transport Certificate
+              </p>
               <div className='flex flex-row'>
-                <IconButton
-                  variant='contained'
-                  onClick={() => {
-                    setCert({
-                      shipper: '',
-                      notifParty: '',
-                      npAddress: '',
-                      description: '',
-                      blNumber: '',
-                      blDate: '',
-                      vesselAndVoyNumber: '',
-                      portOfLoading: '',
-                      portOfDischarge: '',
-                      quantity: '',
-                      netWeight: '',
-                      grossWeight: '',
-                      noOfBags: '',
-                      packing: '',
-                      date: newDate,
-                    });
-                  }}
-                >
-                  <RestartAltRounded />
-                </IconButton>
+                <div>
+                  <Button
+                    variant='contained'
+                    sx={{
+                      backgroundColor: 'gray',
+                      '&:hover': {
+                        backgroundColor: '#6b6a6a',
+                      },
+                    }}
+                    onClick={() => navigate('/certificates')}
+                  >
+                    Cancel
+                  </Button>
+                </div>
                 <LoadingButton
                   type='submit'
                   variant='contained'
-                  loading={addDataLoading}
+                  loading={updateData.addDataLoading}
                   sx={{
-                    mr: 5,
-                    ml: 5,
+                    ml: 3,
                   }}
                   disabled={!validated}
-                  startIcon={<Send />}
+                  startIcon={<Check />}
                 >
                   Submit
                 </LoadingButton>
-                <div>
-                  <Button
-                    startIcon={<Description />}
-                    variant='contained'
-                    onClick={() => navigate('/certificates')}
-                  >
-                    View Certificates
-                  </Button>
-                </div>
               </div>
             </div>
           </Grid>
@@ -280,7 +329,7 @@ function UpdateInlTrCert() {
                         />
                       </Grid>
                       <Grid item lg={6} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='BL Date'

@@ -18,7 +18,7 @@ import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LocalizationProvider, MobileDatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 function NewWeightNote() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
@@ -70,9 +70,7 @@ function NewWeightNote() {
     delete newDec.noOfBagsArray;
     delete newDec.sealNumbersArray;
     newDec.createdAt = new Date().getTime();
-    newDec.blDate = `${weightNote.blDate.getDate()} / ${
-      weightNote.blDate.getMonth() + 1
-    }/${weightNote.blDate.getFullYear()}`;
+    newDec.blDate = weightNote.blDate.format('DD/MM/YYYY');
     setWeightNote(newDec);
     dispatch(addWeightNote(weightNote));
     console.log(weightNote);
@@ -403,7 +401,7 @@ function NewWeightNote() {
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='Date'

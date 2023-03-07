@@ -35,6 +35,12 @@ import NewWeightNote from './pages/docManager/Create/newWeightNote';
 import WeightNotes from './pages/docManager/View/weightNotes';
 import UpdateInvoice from './pages/docManager/Update/updateInvoice';
 import UpdateWeightNote from './pages/docManager/Update/updateWeightNotes';
+import UpdateWayBill from './pages/docManager/Update/updateWaybills';
+import ExpenseMain from './pages/financer/expenseMain';
+import UpdatePackingList from './pages/docManager/Update/updatePackList';
+import UpdateShipmentInstructions from './pages/docManager/Update/updateShipIns';
+import UpdateShipDec from './pages/docManager/Update/updateShipDec';
+import UpdateInlTrCert from './pages/docManager/Update/updateInlTrCer';
 function App() {
   return (
     <Provider store={store}>
@@ -118,11 +124,29 @@ function App() {
                 path='/new-weight-note'
                 element={<NewWeightNote />}
               />
+              <Route exact path='/new-expense' element={<ExpenseMain />} />
               <Route exact path='/update-inv/:id' element={<UpdateInvoice />} />
               <Route
                 exact
                 path='/update-wn/:id'
                 element={<UpdateWeightNote />}
+              />
+              <Route exact path='/update-wb/:id' element={<UpdateWayBill />} />
+              <Route
+                exact
+                path='/update-pl/:id'
+                element={<UpdatePackingList />}
+              />
+              <Route
+                exact
+                path='/update-si/:id'
+                element={<UpdateShipmentInstructions />}
+              />
+              <Route exact path='/update-sd/:id' element={<UpdateShipDec />} />
+              <Route
+                exact
+                path='/update-tc/:id'
+                element={<UpdateInlTrCert />}
               />
             </Routes>
           </div>

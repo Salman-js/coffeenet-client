@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Grid,
   Button,
@@ -12,20 +12,24 @@ import {
   MenuItem,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { Description, Send, RestartAltRounded, Add } from '@mui/icons-material';
-import { addShipDec } from '../../../actions/docmanagerActions';
-import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
+import { Add, Check } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LocalizationProvider, MobileDatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import axios from 'axios';
+import { BASE_URL } from '../../../actions/types';
+import moment from 'moment';
 
 function UpdateShipDec() {
   const { isDocmanagerAuthenticated } = useSelector((state) => state.auth);
-  const { addDataLoading, dataUpdated } = useSelector(
-    (state) => state.adminData
-  );
-  const errors = useSelector((state) => state.errors);
+  const [updateData, setUpdateData] = useState({
+    loading: false,
+    addDataLoading: false,
+    updateSuccess: false,
+  });
+  const [errors, setErrors] = useState(null);
+  const { id } = useParams();
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
   const [shipDec, setShipDec] = useState({
@@ -54,7 +58,6 @@ function UpdateShipDec() {
     netWeightsArray: [''],
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [validated, setValidated] = useState(false);
   const dateChange = (newValue) => {
     setShipDec({
@@ -68,34 +71,108 @@ function UpdateShipDec() {
       osDate: newValue,
     });
   };
-  function onAddDecleration(e) {
+  function onUpdateDecleration(e) {
     e.preventDefault();
     let newDec = shipDec;
+    console.log(shipDec.blDate._i);
+    let arrays = {
+      containerNumbersArray: newDec.containerNumbersArray,
+      noOfBagsArray: newDec.noOfBagsArray,
+      sealNumbersArray: newDec.sealNumbersArray,
+      grossWeightsArray: newDec.grossWeightsArray,
+      netWeightsArray: newDec.netWeightsArray,
+    };
     delete newDec.containerNumbersArray;
     delete newDec.grossWeightsArray;
     delete newDec.netWeightsArray;
     delete newDec.noOfBagsArray;
     delete newDec.sealNumbersArray;
     newDec.createdAt = new Date().getTime();
-    newDec.blDate = `${shipDec.blDate.getDate()} / ${
-      shipDec.blDate.getMonth() + 1
-    }/${shipDec.blDate.getFullYear()}`;
-    newDec.osDate = `${shipDec.osDate.getDate()} / ${
-      shipDec.osDate.getMonth() + 1
-    }/${shipDec.osDate.getFullYear()}`;
+    newDec.blDate = shipDec.blDate.format('DD/MM/YYYY');
+    newDec.osDate = shipDec.osDate.format('DD/MM/YYYY');
     setShipDec(newDec);
-    dispatch(addShipDec(shipDec));
+    updateDoc('shippingdeclerations', shipDec);
     console.log(shipDec);
     setShipDec({
       ...shipDec,
-      containerNumbersArray: [''],
-      sealNumbersArray: [''],
-      noOfBagsArray: [''],
-      grossWeightsArray: [''],
-      netWeightsArray: [''],
+      containerNumbersArray: arrays.containerNumbersArray,
+      noOfBagsArray: arrays.noOfBagsArray,
+      sealNumbersArray: arrays.sealNumbersArray,
+      grossWeightsArray: arrays.grossWeightsArray,
+      netWeightsArray: arrays.netWeightsArray,
+      blDate: moment(shipDec.blDate, 'DD/MM/YYYY'),
+      osDate: moment(shipDec.osDate, 'DD/MM/YYYY'),
     });
   }
 
+  const updateDoc = async (table, shipDec) => {
+    setUpdateData({
+      ...updateData,
+      addDataLoading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+
+    const body = JSON.stringify(shipDec);
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/document/update/${table}`,
+        body,
+        config
+      );
+      setUpdateData({
+        ...updateData,
+        addDataLoading: false,
+        updateSuccess: true,
+      });
+    } catch (err) {
+      setErrors(err.response.data);
+    }
+  };
+  const getDataById = async (table, id) => {
+    setUpdateData({
+      ...updateData,
+      loading: true,
+    });
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': localStorage.getItem('token'),
+      },
+    };
+    try {
+      let res = await axios.get(
+        `${BASE_URL}/api/document/${table}/${id}`,
+        config
+      );
+      res.data[0].containerNumbersArray =
+        res.data[0].containerNumbers.split(',');
+      res.data[0].sealNumbersArray = res.data[0].sealNumbers.split(',');
+      res.data[0].noOfBagsArray = res.data[0].noOfBags.split(',');
+      res.data[0].netWeightsArray = res.data[0].netWeights.split(',');
+      res.data[0].grossWeightsArray = res.data[0].grossWeights.split(',');
+      res.data[0].blDate = moment(res.data[0].blDate, 'DD/MM/YYYY');
+      res.data[0].osDate = moment(res.data[0].osDate, 'DD/MM/YYYY');
+      setShipDec(res.data[0]);
+      console.log('shipDec: ', shipDec);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+      });
+    } catch (err) {
+      console.log(err);
+      setErrors(err.response.data);
+      setUpdateData({
+        ...updateData,
+        loading: false,
+        addDataLoading: false,
+      });
+    }
+  };
   useEffect(() => {
     if (!isDocmanagerAuthenticated) {
       navigate('/');
@@ -109,13 +186,13 @@ function UpdateShipDec() {
       draggable: true,
       theme: 'light',
     };
-    if (Object.keys(errors).length > 0 && errors.unknown) {
+    if (errors && Object.keys(errors).length > 0 && errors.unknown) {
       toast.error('Unknown Error, Please Try Again', toastOptions);
       setTimeout(() => {
-        dispatch(emptyErrors());
+        setErrors(null);
       }, 8000);
     }
-  }, [errors, dispatch]);
+  }, [errors]);
   useEffect(() => {
     const toastOptions = {
       position: 'top-right',
@@ -124,13 +201,16 @@ function UpdateShipDec() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'shipDec added') {
-      toast.success('Shipping Decleration submitted', toastOptions);
+    if (updateData.updateSuccess) {
+      toast.success('Data updated', toastOptions);
       setTimeout(() => {
-        dispatch(resetUpdate());
+        setUpdateData({
+          ...updateData,
+          updateSuccess: false,
+        });
       }, 8000);
     }
-  }, [dataUpdated, dispatch]);
+  }, [updateData]);
   useEffect(() => {
     setValidated(
       Object.values(shipDec).every((value) => {
@@ -144,8 +224,8 @@ function UpdateShipDec() {
       shipDec.containerNumbersArray[0] !== '' &&
         shipDec.sealNumbersArray[0] !== '' &&
         shipDec.noOfBagsArray[0] !== '' &&
-        shipDec.netWeightsArray[0] !== '' &&
-        shipDec.grossWeightsArray[0] !== ''
+        shipDec.grossWeightsArray[0] !== '' &&
+        shipDec.netWeightsArray[0] !== ''
     );
   }, [shipDec]);
   useEffect(() => {
@@ -153,68 +233,43 @@ function UpdateShipDec() {
       navigate('/');
     }
   }, [isDocmanagerAuthenticated, navigate]);
+  useEffect(() => {
+    getDataById('shippingdeclerations', id);
+  }, [id]);
   return (
     <>
       <Grid container className='dashboard-container justify-around'>
-        <form onSubmit={onAddDecleration} className='w-full'>
+        <form onSubmit={onUpdateDecleration} className='w-full'>
           <Grid className='accounts-list-container w-full -mt-3'>
             <div className='w-full flex flex-row justify-between mb-2'>
-              <p className='h4 text-left'>New Shippers Decleration</p>
+              <p className='h4 text-left'>Update Shippers Decleration</p>
               <div className='flex flex-row'>
-                <IconButton
-                  variant='contained'
-                  onClick={() => {
-                    setShipDec({
-                      shipper: '',
-                      product: '',
-                      vesselAndVoyNumber: '',
-                      blNumber: '',
-                      icoNo: '',
-                      certNo: '',
-                      blDate: '',
-                      date: newDate,
-                      reciever: '',
-                      destination: '',
-                      osVesselAndVoyNumber: '',
-                      osBlNumber: '',
-                      osDate: '',
-                      containerNumbers: '',
-                      sealNumbers: '',
-                      noOfBags: '',
-                      grossWeights: '',
-                      netWeights: '',
-                      containerNumbersArray: [''],
-                      sealNumbersArray: [''],
-                      noOfBagsArray: [''],
-                      grossWeightsArray: [''],
-                      netWeightsArray: [''],
-                    });
-                  }}
-                >
-                  <RestartAltRounded />
-                </IconButton>
+                <div>
+                  <Button
+                    variant='contained'
+                    sx={{
+                      backgroundColor: 'gray',
+                      '&:hover': {
+                        backgroundColor: '#6b6a6a',
+                      },
+                    }}
+                    onClick={() => navigate('/shipper-declerations')}
+                  >
+                    Cancel
+                  </Button>
+                </div>
                 <LoadingButton
                   type='submit'
                   variant='contained'
-                  loading={addDataLoading}
+                  loading={updateData.addDataLoading}
                   sx={{
-                    mr: 5,
-                    ml: 5,
+                    ml: 3,
                   }}
                   disabled={!validated}
-                  startIcon={<Send />}
+                  startIcon={<Check />}
                 >
                   Submit
                 </LoadingButton>
-                <div>
-                  <Button
-                    startIcon={<Description />}
-                    variant='contained'
-                    onClick={() => navigate('/shipper-declerations')}
-                  >
-                    View Declerations
-                  </Button>
-                </div>
               </div>
             </div>
           </Grid>
@@ -341,7 +396,7 @@ function UpdateShipDec() {
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='Date'
@@ -426,7 +481,7 @@ function UpdateShipDec() {
                         />
                       </Grid>
                       <Grid item lg={12} className='flex justify-start'>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
                           <MobileDatePicker
                             className='w-full'
                             label='Date'
