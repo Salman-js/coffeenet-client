@@ -16,6 +16,8 @@ import {
   BASE_URL,
   DOCMANAGER_LOGIN_SUCCESS,
   DOCMANAGER_LOADED,
+  WAREHOUSER_LOGIN_SUCCESS,
+  WAREHOUSER_LOADED,
 } from './types';
 import setAuthToken from '../utils/setAuthToken';
 
@@ -115,6 +117,29 @@ export const loadDocmanager = () => async (dispatch) => {
   }
 };
 
+// Load warehouser
+export const loadWarehouser = () => async (dispatch) => {
+  if (localStorage.token) {
+    setAuthToken(localStorage.token);
+  }
+
+  try {
+    const res = await axios.get(`${BASE_URL}/api/auth/warehouser`);
+
+    dispatch({
+      type: WAREHOUSER_LOADED,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: AUTH_ERROR,
+    });
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
 // Register User
 export const register =
   ({ fname, lname, type, email, password, date }) =>
@@ -276,6 +301,40 @@ export const docmanagerLogin = (email, password) => async (dispatch) => {
   }
 };
 
+// Login Warehouser
+export const warehouserLogin = (email, password) => async (dispatch) => {
+  dispatch(loading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const body = JSON.stringify({ email, password });
+
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/auth/warehouser`,
+      body,
+      config
+    );
+
+    dispatch({
+      type: WAREHOUSER_LOGIN_SUCCESS,
+      payload: res.data,
+    });
+
+    dispatch(loadWarehouser());
+  } catch (err) {
+    dispatch({
+      type: LOGIN_FAIL,
+    });
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data ? err.response.data : err,
+    });
+  }
+};
 export const loading = () => (dispatch) => {
   dispatch({ type: LOADING });
 };

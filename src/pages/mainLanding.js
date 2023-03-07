@@ -16,6 +16,7 @@ function MainLanding() {
     isAdminAuthenticated,
     isFinancerAuthenticated,
     isDocmanagerAuthenticated,
+    isWarehouserAuthenticated,
     loading,
   } = useSelector((state) => state.auth);
   const errors = useSelector((state) => state.errors);
@@ -38,11 +39,15 @@ function MainLanding() {
     if (isDocmanagerAuthenticated) {
       navigate('/doc-dashboard');
     }
+    if (isWarehouserAuthenticated) {
+      navigate('/warehouse');
+    }
   }, [
     isAuthenticated,
     isAdminAuthenticated,
     isFinancerAuthenticated,
     isDocmanagerAuthenticated,
+    isWarehouserAuthenticated,
     navigate,
   ]);
   useEffect(() => {

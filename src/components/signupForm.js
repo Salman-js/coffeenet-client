@@ -92,6 +92,7 @@ function SignupForm({
                       <MenuItem value='users'>User</MenuItem>
                       <MenuItem value='financers'>Finance Officer</MenuItem>
                       <MenuItem value='documenters'>Document Officer</MenuItem>
+                      <MenuItem value='warehousers'>Warehouser</MenuItem>
                       <MenuItem value='admins'>Admin</MenuItem>
                     </Select>
                   </FormControl>

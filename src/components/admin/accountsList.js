@@ -77,6 +77,8 @@ function AccountsList({ admin, type }) {
           ? 'Finance Officer'
           : params.row.type === 'documenters'
           ? 'Document Officer'
+          : params.row.type === 'warehousers'
+          ? 'Warehouser'
           : 'Admin',
     },
     {

@@ -12,6 +12,8 @@ import {
   FINANCER_LOADED,
   DOCMANAGER_LOGIN_SUCCESS,
   DOCMANAGER_LOADED,
+  WAREHOUSER_LOADED,
+  WAREHOUSER_LOGIN_SUCCESS,
 } from '../actions/types';
 
 const initialState = {
@@ -20,11 +22,13 @@ const initialState = {
   isAdminAuthenticated: null,
   isFinancerAuthenticated: null,
   isDocmanagerAuthenticated: null,
+  isWarehouserAuthenticated: null,
   loading: false,
   user: null,
   admin: null,
   financer: null,
   docManager: null,
+  warehouser: null,
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -64,6 +68,13 @@ export const authReducer = (state = initialState, action) => {
         loading: false,
         docManager: payload,
       };
+    case WAREHOUSER_LOADED:
+      return {
+        ...state,
+        iseWarehouserAuthenticated: true,
+        loading: false,
+        warehouser: payload,
+      };
     case LOGIN_SUCCESS:
       localStorage.setItem('token', payload.token);
       return {
@@ -96,6 +107,14 @@ export const authReducer = (state = initialState, action) => {
         isDocmanagerAuthenticated: true,
         loading: false,
       };
+    case WAREHOUSER_LOGIN_SUCCESS:
+      localStorage.setItem('token', payload.token);
+      return {
+        ...state,
+        ...payload,
+        isWarehouserAuthenticated: true,
+        loading: false,
+      };
     case REGISTER_FAIL:
     case AUTH_ERROR:
     case LOGIN_FAIL:
@@ -108,10 +127,12 @@ export const authReducer = (state = initialState, action) => {
         isAdminAuthenticated: false,
         isFinancerAuthenticated: false,
         isDocmanagerAuthenticated: false,
+        isWarehouserAuthenticated: false,
         user: null,
         admin: null,
         financer: null,
         docManager: null,
+        warehouser: null,
         loading: false,
       };
     default:

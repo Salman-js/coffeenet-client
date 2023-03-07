@@ -16,6 +16,7 @@ import {
   Logout,
   FolderCopy,
   AccountBalanceWallet,
+  WarehouseOutlined,
 } from '@mui/icons-material';
 import AdminLoginForm from './adminLoginForm';
 import { ToastContainer, toast } from 'react-toastify';
@@ -24,6 +25,7 @@ import { logout } from '../actions/auth';
 import FinancerLoginForm from './financerLoginForm';
 import { emptyErrors } from '../actions/generalActions';
 import DocmanagerLoginForm from './docmanagerLoginForm';
+import WarehouserLoginForm from './warehouserLoginForm';
 
 function TopNav() {
   const {
@@ -31,10 +33,12 @@ function TopNav() {
     admin,
     financer,
     docManager,
+    warehouser,
     isAuthenticated,
     isAdminAuthenticated,
     isFinancerAuthenticated,
     isDocmanagerAuthenticated,
+    isWarehouserAuthenticated,
     loading,
   } = useSelector((state) => state.auth);
   const errors = useSelector((state) => state.errors);
@@ -77,6 +81,7 @@ function TopNav() {
       {!isAuthenticated &&
       !isAdminAuthenticated &&
       !isFinancerAuthenticated &&
+      !isWarehouserAuthenticated &&
       !isDocmanagerAuthenticated ? (
         <NoLoggedNav loading={loading} errors={errors} />
       ) : isAdminAuthenticated && admin && Object.keys(admin).length ? (
@@ -91,6 +96,10 @@ function TopNav() {
         financer &&
         Object.keys(financer).length ? (
         <FinancerNav financer={financer} />
+      ) : isWarehouserAuthenticated &&
+        warehouser &&
+        Object.keys(warehouser).length ? (
+        <WarehouserNav warehouser={warehouser} />
       ) : (
         <NoLoggedNav loading={loading} errors={errors} />
       )}
@@ -101,6 +110,7 @@ function TopNav() {
 const NoLoggedNav = ({ errors, loading }) => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [financerModalOpen, setFinancerModalOpen] = useState(false);
+  const [warehouseModalOpen, setWarehouseModalOpen] = useState(false);
   const [docmanagerModalOpen, setDocmanagerModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -173,6 +183,12 @@ const NoLoggedNav = ({ errors, loading }) => {
               </ListItemIcon>
               Admin Login
             </MenuItem>
+            <MenuItem onClick={() => setWarehouseModalOpen(true)}>
+              <ListItemIcon>
+                <WarehouseOutlined sx={{ color: '#2d384e' }} fontSize='small' />
+              </ListItemIcon>
+              Warehouser Login
+            </MenuItem>
           </Menu>
         </div>
       </div>
@@ -193,6 +209,12 @@ const NoLoggedNav = ({ errors, loading }) => {
         errors={errors}
         financerModalOpen={financerModalOpen}
         setFinancerModalOpen={setFinancerModalOpen}
+      />
+      <WarehouserLoginForm
+        loading={loading}
+        errors={errors}
+        warehouseModalOpen={warehouseModalOpen}
+        setWarehouseModalOpen={setWarehouseModalOpen}
       />
       <ToastContainer />
     </>
@@ -506,6 +528,82 @@ const FinancerNav = ({ financer }) => {
                 <ListItemText
                   primary={financer.fname + ' ' + financer.lname}
                   secondary={financer.email}
+                />
+              </ListItem>
+            </MenuItem>
+            <MenuItem
+              className='text-red-400 px-4 py-2'
+              onClick={() => dispatch(logout())}
+            >
+              <ListItemIcon>
+                <Logout sx={{ color: '#eb7563' }} fontSize='small' />
+              </ListItemIcon>
+              Logout
+            </MenuItem>
+          </Menu>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const WarehouserNav = ({ warehouser }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  // const [search, setSearch] = useState('');
+  const menuOpen = Boolean(anchorEl);
+  const dispatch = useDispatch();
+  const showPopOver = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  return (
+    <>
+      <div className='navbar'>
+        <div className='nav-logo-container'>
+          <img src='./assets/logo.png' width='50px' alt='' />
+        </div>
+        <div className='nav-menu-container my-auto'>
+          <IconButton size='small' onClick={showPopOver}>
+            <Avatar sx={{ width: 30, height: 30 }}>
+              {warehouser.fname.charAt(0)}
+            </Avatar>
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={menuOpen}
+            onClose={() => setAnchorEl(null)}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                color: '#2d384e',
+                bgcolor: '#ffffff',
+                '& .MuiAvatar-root': {},
+                '&:before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 14,
+                  right: -5,
+                  width: 10,
+                  height: 10,
+                  bgcolor: '#fffdfd',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'middle' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+          >
+            <MenuItem>
+              <ListItem disablePadding>
+                <ListItemAvatar>
+                  <Avatar>{warehouser.fname.charAt(0)}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={warehouser.fname + ' ' + warehouser.lname}
+                  secondary={warehouser.email}
                 />
               </ListItem>
             </MenuItem>
