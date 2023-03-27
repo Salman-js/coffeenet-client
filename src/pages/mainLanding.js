@@ -139,7 +139,7 @@ function MainLanding() {
             <Grid item className='flex justify-start p-3 sm:p-0' lg={6} xs={12}>
               <Button
                 variant='contained'
-                className='w-full h-12'
+                className='w-full h-12 ml-4'
                 sx={{
                   backgroundColor: '#403d3d',
                   '&:hover': {

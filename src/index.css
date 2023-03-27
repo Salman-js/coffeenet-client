@@ -111,3 +111,15 @@ code {
 .modal-body legend {
   width: unset;
 }
+
+.admin-dashboard-main-item {
+  @apply shadow-md rounded-2xl;
+}
+
+.file-upload-container {
+  @apply bg-white p-4 px-6 rounded-2xl shadow-md items-center text-center flex justify-center flex-col;
+}
+
+.file-upload-button-container {
+  @apply mt-3;
+}

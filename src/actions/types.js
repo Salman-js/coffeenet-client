@@ -26,6 +26,7 @@ export const SEND_PCR = 'SEND_PCR';
 export const ADD_OFFICEMAT = 'ADD_OFFICEMAT';
 export const ADD_VEHICLES = 'ADD_VEHICLES';
 export const ADD_INVOICE = 'ADD_INVOICE';
+export const ADD_EXPENSE = 'ADD_EXPENSE';
 export const GET_ACTIVE_ACCOUNTS = 'GET_ACTIVE_ACCOUNTS';
 export const GET_PENDING_ACCOUNTS = 'GET_PENDING_ACCOUNTS';
 export const GET_SITES = 'GET_SITES';
