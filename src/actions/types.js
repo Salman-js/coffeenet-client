@@ -41,6 +41,7 @@ export const GET_WAYBILLS = 'GET_WAYBILLS';
 export const GET_CERTS = 'GET_CERTS';
 export const GET_SHIPDECS = 'GET_SHIPDECS';
 export const GET_WEIGHTNOTES = 'GET_WEIGHTNOTES';
+export const GET_EXPENSES = 'GET_EXPENSES';
 export const UPDATE_PCR = 'UPDATE_PCR';
 export const DELETE_PCR = 'DELETE_PCR';
 export const GET_VEHICLES = 'GET_VEHICLES';

@@ -41,6 +41,7 @@ import UpdatePackingList from './pages/docManager/Update/updatePackList';
 import UpdateShipmentInstructions from './pages/docManager/Update/updateShipIns';
 import UpdateShipDec from './pages/docManager/Update/updateShipDec';
 import UpdateInlTrCert from './pages/docManager/Update/updateInlTrCer';
+import ExpensesList from './pages/financer/View/expensesList';
 function App() {
   return (
     <Provider store={store}>
@@ -124,6 +125,7 @@ function App() {
                 path='/new-weight-note'
                 element={<NewWeightNote />}
               />
+              <Route exact path='/expenses' element={<ExpensesList />} />
               <Route exact path='/new-expense' element={<ExpenseMain />} />
               <Route exact path='/update-inv/:id' element={<UpdateInvoice />} />
               <Route

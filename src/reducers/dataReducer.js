@@ -29,6 +29,7 @@ import {
   GET_CERTS,
   GET_SHIPDECS,
   GET_WEIGHTNOTES,
+  GET_EXPENSES,
 } from '../actions/types';
 
 const initialState = {
@@ -47,6 +48,7 @@ const initialState = {
   certificates: [],
   shipDecs: [],
   weightNotes: [],
+  expenses: [],
   loading: false,
   addDataLoading: false,
   dataUpdated: null,
@@ -178,6 +180,12 @@ export const dataReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         weightNotes: payload,
+      };
+    case GET_EXPENSES:
+      return {
+        ...state,
+        loading: false,
+        expenses: payload,
       };
     case GET_OFFICEMATS:
       return {
