@@ -17,6 +17,7 @@ import { emptyErrors, resetUpdate } from '../../actions/generalActions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LoadingButton } from '@mui/lab';
+import { addExpense } from '../../actions/financerActions';
 
 const Input = styled('input')({
   display: 'none',
@@ -31,7 +32,7 @@ function ExpenseMain() {
   const errors = useSelector((state) => state.errors);
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
-  const [receipt, setReceipt] = useState(null);
+  const [receiptFile, setReceipt] = useState(null);
   const navigate = useNavigate();
   const [expense, setExpense] = useState({
     type: '',
@@ -144,14 +145,18 @@ function ExpenseMain() {
   ];
   function onSubmit(e) {
     e.preventDefault();
+    console.log('File: ', Object.keys(receiptFile));
     const expenseData = new FormData();
     expenseData.append('type', expense.type);
     expenseData.append('description', expense.description);
     expenseData.append('amount', expense.amount);
     expenseData.append('paymentMethod', expense.paymentMethod);
-    expenseData.append('receipt', receipt);
+    Object.keys(receiptFile).forEach(function (key, index) {
+      expenseData.append('receipt', receiptFile[key]);
+    });
+    expenseData.append('date', newDate);
     expenseData.append('createdAt', new Date().getTime());
-    console.log(expenseData);
+    dispatch(addExpense(expenseData));
   }
   useEffect(() => {
     if (!isFinancerAuthenticated) {
@@ -181,8 +186,8 @@ function ExpenseMain() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'shipDec added') {
-      toast.success('Shipping Decleration submitted', toastOptions);
+    if (dataUpdated === 'Expense added') {
+      toast.success('Expense data submitted', toastOptions);
       setTimeout(() => {
         dispatch(resetUpdate());
       }, 8000);
@@ -203,6 +208,9 @@ function ExpenseMain() {
                 ml: 5,
               }}
               startIcon={<Send />}
+              disabled={
+                !expense.type || !expense.amount || !expense.paymentMethod
+              }
             >
               Submit
             </LoadingButton>
@@ -226,6 +234,7 @@ function ExpenseMain() {
                     labelId='select-label'
                     id='simple-select'
                     value={expense.type}
+                    className='text-left'
                     label='Expense Type'
                     onChange={(e) =>
                       setExpense({
@@ -266,6 +275,7 @@ function ExpenseMain() {
                     labelId='select-label'
                     id='simple-select'
                     value={expense.paymentMethod}
+                    className='text-left'
                     label='Method of Payment'
                     onChange={(e) =>
                       setExpense({
@@ -305,7 +315,7 @@ function ExpenseMain() {
                 <div className='admin-dashboard-main-item'>
                   <div className='file-upload-container'>
                     <div className='upload-icon-container p-3 w-fit text-center items-center flex justify-center mx-auto rounded-full border border-dashed border-gray-400'>
-                      {receipt !== null ? <CheckRounded /> : <Receipt />}
+                      {receiptFile !== null ? <CheckRounded /> : <Receipt />}
                     </div>
                     <Box
                       sx={{
@@ -318,13 +328,14 @@ function ExpenseMain() {
                     </Box>
                     <Box>
                       <div className='file-upload-button-container'>
-                        <label htmlFor='portrait-file'>
+                        <label htmlFor='receipt-file'>
                           <Input
                             accept='image/*'
-                            id='portrait-file'
-                            name='portrait'
+                            id='receipt-file'
+                            name='receipt'
                             type='file'
-                            onChange={(e) => setReceipt(e.target.files[0])}
+                            multiple
+                            onChange={(e) => setReceipt(e.target.files)}
                           />
                           <Button
                             sx={{ borderRadius: '2em' }}
