@@ -9,21 +9,23 @@ import {
   Select,
   MenuItem,
   TextField,
+  OutlinedInput,
+  InputAdornment,
 } from '@mui/material';
 import { CheckRounded, Receipt, Send } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import { styled } from '@mui/material/styles';
-import { emptyErrors, resetUpdate } from '../../actions/generalActions';
+import { emptyErrors, resetUpdate } from '../../../actions/generalActions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LoadingButton } from '@mui/lab';
-import { addExpense } from '../../actions/financerActions';
+import { addCost } from '../../../actions/financerActions';
 
 const Input = styled('input')({
   display: 'none',
 });
 
-function ExpenseMain() {
+function CostMain() {
   const { isFinancerAuthenticated } = useSelector((state) => state.auth);
   const { addDataLoading, dataUpdated } = useSelector(
     (state) => state.adminData
@@ -34,129 +36,27 @@ function ExpenseMain() {
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
   const [receiptFile, setReceipt] = useState(null);
   const navigate = useNavigate();
-  const [expense, setExpense] = useState({
+  const [cost, setCost] = useState({
     type: '',
-    description: '',
     amount: '',
+    unitPrice: '',
     date: newDate,
     paymentMethod: '',
   });
-  const expenseTypes = [
-    {
-      name: 'Stationary',
-      route: 'stationary',
-    },
-    {
-      name: 'Telephone',
-      route: 'telephone',
-    },
-    {
-      name: 'Rent',
-      route: 'rent',
-    },
-    {
-      name: 'Cleaning',
-      route: 'cleaning',
-    },
-    {
-      name: 'Bank Service Charge',
-      route: 'bank-service',
-    },
-    {
-      name: 'Repair',
-      route: 'repair',
-    },
-    {
-      name: 'Salary',
-      route: 'salary',
-    },
-    {
-      name: 'Pension',
-      route: 'pension',
-    },
-    {
-      name: 'Transport',
-      route: 'transport',
-    },
-    {
-      name: 'Fuel',
-      route: 'fuel',
-    },
-    {
-      name: 'Interest',
-      route: 'interest',
-    },
-    {
-      name: 'Donation',
-      route: 'donation',
-    },
-    {
-      name: 'Penality',
-      route: 'penality',
-    },
-    {
-      name: 'Postage',
-      route: 'postage',
-    },
-    {
-      name: 'Amortization',
-      route: 'amortization',
-    },
-    {
-      name: 'License',
-      route: 'license',
-    },
-    {
-      name: 'Depratation',
-      route: 'depratation',
-    },
-    {
-      name: 'Miscellaneous',
-      route: 'miscellaneous',
-    },
-    {
-      name: 'Utility',
-      route: 'utility',
-    },
-    {
-      name: 'Travel',
-      route: 'travel',
-    },
-    {
-      name: 'Insurance',
-      route: 'insurance',
-    },
-    {
-      name: 'Membership',
-      route: 'membership',
-    },
-    {
-      name: 'Protectional fee',
-      route: 'protectional-fee',
-    },
-    {
-      name: 'Promotion',
-      route: 'promotion',
-    },
-    {
-      name: 'Loading & Unloading',
-      route: 'loading-unloading',
-    },
-  ];
+  const purchaseTypes = ['Local', 'ECX'];
   function onSubmit(e) {
     e.preventDefault();
-    console.log('File: ', Object.keys(receiptFile));
     const expenseData = new FormData();
-    expenseData.append('type', expense.type);
-    expenseData.append('description', expense.description);
-    expenseData.append('amount', expense.amount);
-    expenseData.append('paymentMethod', expense.paymentMethod);
+    expenseData.append('type', cost.type);
+    expenseData.append('amount', cost.amount);
+    expenseData.append('unitPrice', cost.unitPrice);
+    expenseData.append('paymentMethod', cost.paymentMethod);
     Object.keys(receiptFile).forEach(function (key, index) {
       expenseData.append('receipt', receiptFile[key]);
     });
     expenseData.append('date', newDate);
     expenseData.append('createdAt', new Date().getTime());
-    dispatch(addExpense(expenseData));
+    dispatch(addCost(expenseData));
   }
   useEffect(() => {
     if (!isFinancerAuthenticated) {
@@ -186,8 +86,8 @@ function ExpenseMain() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'Expense added') {
-      toast.success('Expense data submitted', toastOptions);
+    if (dataUpdated === 'Cost added') {
+      toast.success('Cost/purchase data submitted', toastOptions);
       setTimeout(() => {
         dispatch(resetUpdate());
       }, 8000);
@@ -198,7 +98,7 @@ function ExpenseMain() {
       <form onSubmit={onSubmit} className='w-full'>
         <Grid className='accounts-list-container w-full -mt-4'>
           <div className='w-full flex flex-row justify-between mb-2'>
-            <p className='h4 text-left'>Expenses</p>
+            <p className='h4 text-left'>Cost/Purchase</p>
             <LoadingButton
               type='submit'
               variant='contained'
@@ -208,9 +108,7 @@ function ExpenseMain() {
                 ml: 5,
               }}
               startIcon={<Send />}
-              disabled={
-                !expense.type || !expense.amount || !expense.paymentMethod
-              }
+              disabled={!cost.type || !cost.amount || !cost.paymentMethod}
             >
               Submit
             </LoadingButton>
@@ -229,24 +127,24 @@ function ExpenseMain() {
             <Grid item lg={3}>
               <Grid item lg={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Expense Type</InputLabel>
+                  <InputLabel>Purchase Type</InputLabel>
                   <Select
                     labelId='select-label'
                     id='simple-select'
-                    value={expense.type}
+                    value={cost.type}
                     className='text-left'
-                    label='Expense Type'
+                    label='Purchase Type'
                     onChange={(e) =>
-                      setExpense({
-                        ...expense,
+                      setCost({
+                        ...cost,
                         type: e.target.value,
                       })
                     }
                   >
-                    {expenseTypes.map((expenseType, index) => {
+                    {purchaseTypes.map((purchaseType, index) => {
                       return (
-                        <MenuItem value={expenseType.name}>
-                          {expenseType.name}
+                        <MenuItem key={index} value={purchaseType}>
+                          {purchaseType}
                         </MenuItem>
                       );
                     })}
@@ -254,32 +152,17 @@ function ExpenseMain() {
                 </FormControl>
               </Grid>
               <Grid item lg={12}>
-                <TextField
-                  className='w-full mt-3'
-                  type='number'
-                  value={expense.amount}
-                  autoComplete='false'
-                  onChange={(e) =>
-                    setExpense({
-                      ...expense,
-                      amount: e.target.value,
-                    })
-                  }
-                  label='Amount'
-                />
-              </Grid>
-              <Grid item lg={12}>
                 <FormControl fullWidth className='mt-3'>
                   <InputLabel>Method of Payment</InputLabel>
                   <Select
                     labelId='select-label'
                     id='simple-select'
-                    value={expense.paymentMethod}
+                    value={cost.paymentMethod}
                     className='text-left'
                     label='Method of Payment'
                     onChange={(e) =>
-                      setExpense({
-                        ...expense,
+                      setCost({
+                        ...cost,
                         paymentMethod: e.target.value,
                       })
                     }
@@ -295,19 +178,40 @@ function ExpenseMain() {
               <Grid item lg={12}>
                 <TextField
                   className='w-full'
-                  type='text'
-                  multiline
-                  minRows={3}
-                  value={expense.description}
+                  type='number'
+                  value={cost.amount}
                   autoComplete='false'
                   onChange={(e) =>
-                    setExpense({
-                      ...expense,
-                      description: e.target.value,
+                    setCost({
+                      ...cost,
+                      amount: e.target.value,
                     })
                   }
-                  label='Description'
+                  label='Amount'
                 />
+              </Grid>
+              <Grid item lg={12}>
+                <FormControl fullWidth variant='outlined' className='mt-3'>
+                  <InputLabel>Unit Price</InputLabel>
+                  <OutlinedInput
+                    className='w-full'
+                    type='number'
+                    value={cost.unitPrice}
+                    autoComplete='false'
+                    onChange={(e) =>
+                      setCost({
+                        ...cost,
+                        unitPrice: e.target.value,
+                      })
+                    }
+                    label='Unit Price'
+                    endAdornment={
+                      <InputAdornment position='end'>
+                        Total: {cost.unitPrice * cost.amount}
+                      </InputAdornment>
+                    }
+                  />
+                </FormControl>
               </Grid>
             </Grid>
             <Grid item lg={4}>
@@ -360,4 +264,4 @@ function ExpenseMain() {
   );
 }
 
-export default ExpenseMain;
+export default CostMain;

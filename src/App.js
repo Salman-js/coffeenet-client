@@ -36,12 +36,13 @@ import WeightNotes from './pages/docManager/View/weightNotes';
 import UpdateInvoice from './pages/docManager/Update/updateInvoice';
 import UpdateWeightNote from './pages/docManager/Update/updateWeightNotes';
 import UpdateWayBill from './pages/docManager/Update/updateWaybills';
-import ExpenseMain from './pages/financer/expenseMain';
+import ExpenseMain from './pages/financer/Create/expenseMain';
 import UpdatePackingList from './pages/docManager/Update/updatePackList';
 import UpdateShipmentInstructions from './pages/docManager/Update/updateShipIns';
 import UpdateShipDec from './pages/docManager/Update/updateShipDec';
 import UpdateInlTrCert from './pages/docManager/Update/updateInlTrCer';
 import ExpensesList from './pages/financer/View/expensesList';
+import CostMain from './pages/financer/Create/costMain';
 function App() {
   return (
     <Provider store={store}>
@@ -127,6 +128,7 @@ function App() {
               />
               <Route exact path='/expenses' element={<ExpensesList />} />
               <Route exact path='/new-expense' element={<ExpenseMain />} />
+              <Route exact path='/new-cost' element={<CostMain />} />
               <Route exact path='/update-inv/:id' element={<UpdateInvoice />} />
               <Route
                 exact

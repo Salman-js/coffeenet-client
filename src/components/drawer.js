@@ -1171,7 +1171,7 @@ const FinancerDrawer = ({ drawerIn, open, setOpen }) => {
               </ListItem>
             </Link>
           </List>
-          <Link to='/cost'>
+          <Link to='/new-cost'>
             <ListItem disablePadding sx={{ display: 'block' }}>
               <ListItemButton
                 sx={{
@@ -1191,7 +1191,7 @@ const FinancerDrawer = ({ drawerIn, open, setOpen }) => {
                 </ListItemIcon>
                 <ListItemText
                   sx={{ opacity: open ? 1 : 0 }}
-                  primary='Purchase'
+                  primary='Cost/Purchase'
                 />
               </ListItemButton>
             </ListItem>
