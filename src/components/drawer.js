@@ -47,6 +47,8 @@ import {
   WarehouseOutlined,
   PriceCheckOutlined,
   RequestQuoteOutlined,
+  LocalAtmOutlined,
+  AddShoppingCartOutlined,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { getActiveAccs, getPendingAccs } from '../actions/adminActions';
@@ -1171,31 +1173,104 @@ const FinancerDrawer = ({ drawerIn, open, setOpen }) => {
               </ListItem>
             </Link>
           </List>
-          <Link to='/new-cost'>
-            <ListItem disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
+          <ListItem disablePadding sx={{ display: 'block' }}>
+            <Accordion
+              sx={{
+                minWidth: 0,
+                mr: open ? 'auto' : 6,
+                justifyContent: 'center',
+              }}
+              className='p-0 shadow-none w-full bg-slate-400'
+            >
+              <AccordionSummary
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
+                  display: open ? '' : 'block',
                 }}
+                expandIcon={open ? <ExpandMore /> : null}
+                className='p-0 w-full'
               >
-                <ListItemIcon
+                <ListItemButton
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 1.7,
                   }}
                 >
-                  <PaidOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  sx={{ opacity: open ? 1 : 0 }}
-                  primary='Cost/Purchase'
-                />
-              </ListItemButton>
-            </ListItem>
-          </Link>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <PaidOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ opacity: open ? 1 : 0 }}
+                    primary='Cost/Purchase'
+                  />
+                </ListItemButton>
+              </AccordionSummary>
+              <AccordionDetails className='p-0 bg-slate-300'>
+                <Link to='/purchases'>
+                  <ListItem disablePadding sx={{ display: 'block' }}>
+                    <ListItemButton
+                      sx={{
+                        minHeight: 48,
+                        justifyContent: open ? 'initial' : 'center',
+                        px: 2.5,
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: open ? 3 : 'auto',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <LocalAtmOutlined />
+                      </ListItemIcon>
+                      <ListItemText
+                        sx={{ opacity: open ? 1 : 0 }}
+                        primary='Purchases List'
+                        primaryTypographyProps={{
+                          fontSize: 13,
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </Link>
+                <Link to='/new-cost'>
+                  <ListItem disablePadding sx={{ display: 'block' }}>
+                    <ListItemButton
+                      sx={{
+                        minHeight: 48,
+                        justifyContent: open ? 'initial' : 'center',
+                        px: 2.5,
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: open ? 3 : 'auto',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <AddShoppingCartOutlined />
+                      </ListItemIcon>
+                      <ListItemText
+                        sx={{ opacity: open ? 1 : 0 }}
+                        primary='New Purchase'
+                        primaryTypographyProps={{
+                          fontSize: 13,
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </Link>
+              </AccordionDetails>
+            </Accordion>
+          </ListItem>
           <Link to='/inventory'>
             <ListItem disablePadding sx={{ display: 'block' }}>
               <ListItemButton

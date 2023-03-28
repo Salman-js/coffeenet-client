@@ -43,6 +43,7 @@ import UpdateShipDec from './pages/docManager/Update/updateShipDec';
 import UpdateInlTrCert from './pages/docManager/Update/updateInlTrCer';
 import ExpensesList from './pages/financer/View/expensesList';
 import CostMain from './pages/financer/Create/costMain';
+import PurchasesList from './pages/financer/View/purchasesList';
 function App() {
   return (
     <Provider store={store}>
@@ -127,6 +128,7 @@ function App() {
                 element={<NewWeightNote />}
               />
               <Route exact path='/expenses' element={<ExpensesList />} />
+              <Route exact path='/purchases' element={<PurchasesList />} />
               <Route exact path='/new-expense' element={<ExpenseMain />} />
               <Route exact path='/new-cost' element={<CostMain />} />
               <Route exact path='/update-inv/:id' element={<UpdateInvoice />} />

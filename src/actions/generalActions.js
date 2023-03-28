@@ -17,6 +17,7 @@ import {
   GET_SHIPDECS,
   GET_WEIGHTNOTES,
   GET_EXPENSES,
+  GET_COSTS,
 } from './types';
 
 // Get samples
@@ -322,6 +323,30 @@ export const getExpenses = () => async (dispatch) => {
     });
   }
 };
+
+// Get Costs
+export const getCosts = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/finance/costs`, config);
+    dispatch({
+      type: GET_COSTS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
 export const emptyErrors = () => (dispatch) => {
   dispatch({
     type: GET_ERRORS,
