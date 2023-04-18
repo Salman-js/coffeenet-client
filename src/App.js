@@ -44,6 +44,7 @@ import UpdateInlTrCert from './pages/docManager/Update/updateInlTrCer';
 import ExpensesList from './pages/financer/View/expensesList';
 import CostMain from './pages/financer/Create/costMain';
 import PurchasesList from './pages/financer/View/purchasesList';
+import WarehouseMain from './pages/warehouser/warehouseMain';
 function App() {
   return (
     <Provider store={store}>
@@ -154,6 +155,7 @@ function App() {
                 path='/update-tc/:id'
                 element={<UpdateInlTrCert />}
               />
+              <Route exact path='/warehouse' element={<WarehouseMain />} />
             </Routes>
           </div>
         </div>
