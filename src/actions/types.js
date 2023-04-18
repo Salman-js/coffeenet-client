@@ -43,6 +43,7 @@ export const GET_SHIPDECS = 'GET_SHIPDECS';
 export const GET_WEIGHTNOTES = 'GET_WEIGHTNOTES';
 export const GET_EXPENSES = 'GET_EXPENSES';
 export const GET_COSTS = 'GET_COSTS';
+export const GET_WAREHOUSE = 'GET_WAREHOUSE';
 export const UPDATE_PCR = 'UPDATE_PCR';
 export const DELETE_PCR = 'DELETE_PCR';
 export const GET_VEHICLES = 'GET_VEHICLES';

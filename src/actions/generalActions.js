@@ -18,6 +18,7 @@ import {
   GET_WEIGHTNOTES,
   GET_EXPENSES,
   GET_COSTS,
+  GET_WAREHOUSE,
 } from './types';
 
 // Get samples
@@ -337,6 +338,29 @@ export const getCosts = () => async (dispatch) => {
     const res = await axios.get(`${BASE_URL}/api/finance/costs`, config);
     dispatch({
       type: GET_COSTS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Get Warehouse list
+export const getWarehouseList = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/finance/costs`, config);
+    dispatch({
+      type: GET_WAREHOUSE,
       payload: res.data,
     });
   } catch (err) {

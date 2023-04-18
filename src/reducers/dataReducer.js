@@ -31,6 +31,7 @@ import {
   GET_WEIGHTNOTES,
   GET_EXPENSES,
   GET_COSTS,
+  GET_WAREHOUSE,
 } from '../actions/types';
 
 const initialState = {
@@ -51,6 +52,7 @@ const initialState = {
   weightNotes: [],
   expenses: [],
   costs: [],
+  warehouseList: [],
   loading: false,
   addDataLoading: false,
   dataUpdated: null,
@@ -194,6 +196,12 @@ export const dataReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         costs: payload,
+      };
+    case GET_WAREHOUSE:
+      return {
+        ...state,
+        loading: false,
+        warehouseList: payload,
       };
     case GET_OFFICEMATS:
       return {
