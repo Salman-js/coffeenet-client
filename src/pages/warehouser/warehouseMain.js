@@ -4,34 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import {
   Grid,
   Button,
-  FormControl,
-  InputLabel,
   TextField,
-  OutlinedInput,
-  InputAdornment,
   Accordion,
   AccordionSummary,
   Typography,
   AccordionDetails,
 } from '@mui/material';
-import {
-  CheckRounded,
-  Description,
-  ExpandMore,
-  Receipt,
-  Send,
-} from '@mui/icons-material';
-import { Box } from '@mui/system';
-import { styled } from '@mui/material/styles';
+import { Description, ExpandMore, Send } from '@mui/icons-material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LoadingButton } from '@mui/lab';
-import { addCost } from '../../actions/financerActions';
 import { emptyErrors, resetUpdate } from '../../actions/generalActions';
-
-const Input = styled('input')({
-  display: 'none',
-});
+import { addWarehouseList } from '../../actions/warehouserActions';
 
 function WarehouseMain() {
   const { isWarehouserAuthenticated } = useSelector((state) => state.auth);
@@ -42,7 +26,6 @@ function WarehouseMain() {
   const errors = useSelector((state) => state.errors);
   const Day = new Date();
   const newDate = `${Day.getDate()}/${Day.getMonth() + 1}/${Day.getFullYear()}`;
-  const [receiptFile, setReceipt] = useState(null);
   const navigate = useNavigate();
   const [coffee, setCoffee] = useState({
     total: '',
@@ -54,17 +37,11 @@ function WarehouseMain() {
   });
   function onSubmit(e) {
     e.preventDefault();
-    const expenseData = new FormData();
-    expenseData.append('type', coffee.type);
-    expenseData.append('amount', coffee.amount);
-    expenseData.append('unitPrice', coffee.unitPrice);
-    expenseData.append('paymentMethod', coffee.paymentMethod);
-    Object.keys(receiptFile).forEach(function (key, index) {
-      expenseData.append('receipt', receiptFile[key]);
-    });
-    expenseData.append('date', newDate);
-    expenseData.append('createdAt', new Date().getTime());
-    dispatch(addCost(expenseData));
+    const newCoffeeData = {
+      ...coffee,
+      createdAt: new Date().getTime(),
+    };
+    dispatch(addWarehouseList(newCoffeeData));
   }
   useEffect(() => {
     if (!isWarehouserAuthenticated) {
@@ -94,8 +71,8 @@ function WarehouseMain() {
       draggable: true,
       theme: 'light',
     };
-    if (dataUpdated === 'Cost added') {
-      toast.success('Cost/purchase data submitted', toastOptions);
+    if (dataUpdated === 'Warehouse added') {
+      toast.success('List submitted', toastOptions);
       setTimeout(() => {
         dispatch(resetUpdate());
       }, 8000);
