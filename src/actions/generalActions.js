@@ -358,7 +358,7 @@ export const getWarehouseList = () => async (dispatch) => {
     },
   };
   try {
-    const res = await axios.get(`${BASE_URL}/api/finance/costs`, config);
+    const res = await axios.get(`${BASE_URL}/api/user/warehouse`, config);
     dispatch({
       type: GET_WAREHOUSE,
       payload: res.data,
