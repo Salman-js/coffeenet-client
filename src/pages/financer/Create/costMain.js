@@ -43,7 +43,7 @@ function CostMain() {
     date: newDate,
     paymentMethod: '',
   });
-  const purchaseTypes = ['Local', 'ECX'];
+  const purchaseTypes = ['Local', 'ECX', 'Vertical', 'Horizontal'];
   function onSubmit(e) {
     e.preventDefault();
     const expenseData = new FormData();
