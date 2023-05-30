@@ -19,6 +19,8 @@ import {
   GET_EXPENSES,
   GET_COSTS,
   GET_WAREHOUSE,
+  GET_INVENTORY,
+  GET_ASSETS,
 } from './types';
 
 // Get samples
@@ -361,6 +363,52 @@ export const getWarehouseList = () => async (dispatch) => {
     const res = await axios.get(`${BASE_URL}/api/user/warehouse`, config);
     dispatch({
       type: GET_WAREHOUSE,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Get Inventory Entries
+export const getInventoryEntries = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/finance/inventories`, config);
+    dispatch({
+      type: GET_INVENTORY,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Get Assets
+export const getAssets = () => async (dispatch) => {
+  dispatch(setLoading());
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth-token': localStorage.getItem('token'),
+    },
+  };
+  try {
+    const res = await axios.get(`${BASE_URL}/api/finance/assets`, config);
+    dispatch({
+      type: GET_ASSETS,
       payload: res.data,
     });
   } catch (err) {

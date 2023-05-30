@@ -46,6 +46,10 @@ import CostMain from './pages/financer/Create/costMain';
 import PurchasesList from './pages/financer/View/purchasesList';
 import WarehouseMain from './pages/warehouser/warehouseMain';
 import WarehouseList from './pages/warehouser/warehouseList';
+import InventoryMain from './pages/financer/Create/inventoryMain';
+import InventoryList from './pages/financer/View/inventoryList';
+import AssetMain from './pages/financer/Create/assetMain';
+import AssetList from './pages/financer/View/assetList';
 function App() {
   return (
     <Provider store={store}>
@@ -131,8 +135,12 @@ function App() {
               />
               <Route exact path='/expenses' element={<ExpensesList />} />
               <Route exact path='/purchases' element={<PurchasesList />} />
+              <Route exact path='/inventory' element={<InventoryList />} />
+              <Route exact path='/asset' element={<AssetList />} />
               <Route exact path='/new-expense' element={<ExpenseMain />} />
               <Route exact path='/new-cost' element={<CostMain />} />
+              <Route exact path='/new-inventory' element={<InventoryMain />} />
+              <Route exact path='/new-asset' element={<AssetMain />} />
               <Route exact path='/update-inv/:id' element={<UpdateInvoice />} />
               <Route
                 exact

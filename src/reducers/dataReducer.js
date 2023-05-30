@@ -32,6 +32,8 @@ import {
   GET_EXPENSES,
   GET_COSTS,
   GET_WAREHOUSE,
+  GET_INVENTORY,
+  GET_ASSETS,
 } from '../actions/types';
 
 const initialState = {
@@ -53,6 +55,8 @@ const initialState = {
   expenses: [],
   costs: [],
   warehouseList: [],
+  inventoryEntries: [],
+  assets: [],
   loading: false,
   addDataLoading: false,
   dataUpdated: null,
@@ -202,6 +206,18 @@ export const dataReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         warehouseList: payload,
+      };
+    case GET_INVENTORY:
+      return {
+        ...state,
+        loading: false,
+        inventoryEntries: payload,
+      };
+    case GET_ASSETS:
+      return {
+        ...state,
+        loading: false,
+        assets: payload,
       };
     case GET_OFFICEMATS:
       return {

@@ -57,3 +57,57 @@ export const addCost = (costData) => async (dispatch) => {
     });
   }
 };
+
+// Add Inventory
+export const addInventory = (inventoryData) => async (dispatch) => {
+  dispatch(setAddLoading());
+  const config = {
+    headers: {
+      'x-auth-token': localStorage.getItem('token'),
+    },
+    timeout: 5000,
+  };
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/finance/add-inventory`,
+      inventoryData,
+      config
+    );
+    dispatch({
+      type: DATA_UPDATED,
+      payload: 'Inventory added',
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
+
+// Add Asset
+export const addAsset = (assetData) => async (dispatch) => {
+  dispatch(setAddLoading());
+  const config = {
+    headers: {
+      'x-auth-token': localStorage.getItem('token'),
+    },
+    timeout: 5000,
+  };
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/finance/add-asset`,
+      assetData,
+      config
+    );
+    dispatch({
+      type: DATA_UPDATED,
+      payload: 'Asset added',
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    });
+  }
+};
